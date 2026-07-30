@@ -1,0 +1,22 @@
+import React from 'react';
+import BuyerSellerMatcher from './buyer-seller-matcher';
+import FraudDetectionScoring from './fraud-detection-scoring';
+import PricingDashboard from './pricing-dashboard';
+
+export default function App() {
+  return (
+    <div class="space-y-12 p-4 md:p-8 max-w-7xl mx-auto">
+      <section>
+        <BuyerSellerMatcher />
+      </section>
+      <hr class="border-gray-300 my-8" />
+      <section>
+        <FraudDetectionScoring />
+      </section>
+      <hr class="border-gray-300 my-8" />
+      <section>
+        <PricingDashboard />
+      </section>
+    </div>
+  );
+}
