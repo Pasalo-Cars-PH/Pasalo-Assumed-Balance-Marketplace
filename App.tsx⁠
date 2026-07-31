@@ -5,18 +5,12 @@ import PricingDashboard from './pricing-dashboard';
 
 export default function App() {
   return (
-    <div class="space-y-12 p-4 md:p-8 max-w-7xl mx-auto">
-      <section>
-        <BuyerSellerMatcher />
-      </section>
-      <hr class="border-gray-300 my-8" />
-      <section>
-        <FraudDetectionScoring />
-      </section>
-      <hr class="border-gray-300 my-8" />
-      <section>
-        <PricingDashboard />
-      </section>
+    <div className="space-y-12 p-4 md:p-8 max-w-7xl mx-auto">
+      <BuyerSellerMatcher />
+      <hr className="border-gray-300 my-8" />
+      <FraudDetectionScoring />
+      <hr className="border-gray-300 my-8" />
+      <PricingDashboard />
     </div>
   );
 }
