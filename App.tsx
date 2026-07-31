@@ -49,7 +49,7 @@ const initialVehicles: Vehicle[] = [
 
 // Fill in from Supabase: Settings > API Keys (Project URL already matches your project ref)
 const SUPABASE_URL = 'https://nhssuoytlanpfdsqhjhy.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oc3N1b3l0bGFucGZkc3Foamh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NTY3NTYsImV4cCI6MjEwMDAzMjc1Nn0.yOhTwkKmrHzbN1b-TZ-VNzNTdPEoLPZx4rp9s7T_s_0';
 
 const emptyBuyerForm: BuyerProfile = {
   fullname: '', mobile: '', email: '', location: '',
