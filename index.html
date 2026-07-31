@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pasalo Cars PH - Fraud Detection & Quality Scoring</title>
+  <title>Pasalo Cars PH - Trust & Fraud Engine</title>
 
-  <!-- 1. Tailwind CSS -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- 2. React & React DOM -->
+  <!-- React & React DOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <!-- 3. Babel Compiler (para sa JSX) -->
+  <!-- Babel Compiler -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- 4. Lucide Icons -->
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-slate-900 text-white min-h-screen">
@@ -35,9 +35,9 @@
       return <i data-lucide={name} style={{ width: size, height: size, ...style }} className={`inline-block ${className}`}></i>;
     };
 
-    const FraudDetectionScoring = () => {
-      // Vehicle Data
-      const vehicleData = [
+    const PasaloPlatformApp = () => {
+      // Base Data
+      const initialVehicles = [
         { id: 1, model: '2026 Toyota Fortuner G A/T', monthly: 38767, bank: 'TFS', months: 60, cashout: 0, brand: 'Toyota', type: 'SUV', status: 'Brand New', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
         { id: 2, model: '2026 Ford Everest Titanium 4x2', monthly: 47000, bank: 'BPI', months: 60, cashout: 0, brand: 'Ford', type: 'SUV', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 7 },
         { id: 3, model: '2026 Toyota Raize G A/T', monthly: 18639, bank: 'TFS', months: 60, cashout: 180000, brand: 'Toyota', type: 'SUV', status: 'Brand New', demand: 'very_high', mileage: 0, year: 2026, issues: [], documents: true, photos: 9 },
@@ -48,31 +48,19 @@
         { id: 8, model: '2025 Toyota Hilux GR-S 4x4 A/T', monthly: 43232, bank: 'BDO', months: 46, cashout: 0, brand: 'Toyota', type: 'Pickup', status: 'Assume Balance', demand: 'high', mileage: 8900, year: 2025, issues: [], documents: true, photos: 8 },
         { id: 9, model: '2026 Mitsubishi Xpander Cross A/T', monthly: 28878, bank: 'EastWest', months: 60, cashout: 0, brand: 'Mitsubishi', type: 'MPV', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 7 },
         { id: 10, model: '2026 Toyota Wigo G CVT', monthly: 15513, bank: 'TFS', months: 60, cashout: 145000, brand: 'Toyota', type: 'Hatchback', status: 'Brand New', demand: 'very_high', mileage: 0, year: 2026, issues: [], documents: true, photos: 9 },
-        { id: 11, model: '2026 Toyota Yaris Cross Hybrid', monthly: 29789, bank: 'TFS', months: 60, cashout: 0, brand: 'Toyota', type: 'Crossover', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
-        { id: 12, model: '2026 Toyota Innova Zenix Q HEV', monthly: 43243, bank: 'SRP', months: 60, cashout: 0, brand: 'Toyota', type: 'MPV', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 9 },
-        { id: 13, model: '2026 Ford Ranger Raptor 4x4 A/T', monthly: 54000, bank: 'BPI', months: 60, cashout: 0, brand: 'Ford', type: 'Pickup', status: 'For Release', demand: 'medium', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
-        { id: 14, model: '2025 BAIC B60 TDi Hybrid', monthly: 45357, bank: 'Direct', months: 48, cashout: 0, brand: 'BAIC', type: 'SUV', status: 'Assume Balance', demand: 'medium', mileage: 12500, year: 2025, issues: ['Minor paint scratch'], documents: true, photos: 5 },
-        { id: 15, model: '2026 Mitsubishi Montero Sport GLS', monthly: 39891, bank: 'BDO', months: 60, cashout: 0, brand: 'Mitsubishi', type: 'SUV', status: 'Brand New', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
-        { id: 16, model: '2026 MG 4 AT Electric Vehicle', monthly: 27619, bank: 'Direct', months: 60, cashout: 0, brand: 'MG', type: 'Crossover', status: 'Brand New', demand: 'medium', mileage: 0, year: 2026, issues: [], documents: true, photos: 7 },
-        { id: 17, model: '2026 Suzuki Ertiga Hybrid AT', monthly: 24457, bank: 'PSBank', months: 60, cashout: 0, brand: 'Suzuki', type: 'MPV', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 6 },
-        { id: 18, model: '2026 Toyota Avanza E CVT', monthly: 22476, bank: 'TFS', months: 60, cashout: 0, brand: 'Toyota', type: 'MPV', status: 'Assume Balance', demand: 'high', mileage: 3400, year: 2026, issues: [], documents: true, photos: 7 },
         { id: 19, model: '2026 Jetour X70 i-DM A/T', monthly: 32251, bank: 'RCBC', months: 60, cashout: 350000, brand: 'Jetour', type: 'SUV', status: 'Brand New', demand: 'medium', mileage: 0, year: 2026, issues: [], documents: false, photos: 4 },
-        { id: 20, model: '2026 Toyota Avanza 1.3 E CVT', monthly: 23245, bank: 'TFS', months: 60, cashout: 170000, brand: 'Toyota', type: 'MPV', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
-        { id: 21, model: '2026 MG 5 Core A/T', monthly: 15309, bank: 'Direct', months: 60, cashout: 100000, brand: 'MG', type: 'Sedan', status: 'Brand New', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 7 },
-        { id: 22, model: '2026 Toyota Vios XLE CVT A/T', monthly: 17966, bank: 'TFS', months: 60, cashout: 120000, brand: 'Toyota', type: 'Sedan', status: 'Brand New', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
-        { id: 23, model: '2026 Ford Mustang Mach-E A/T', monthly: 54287, bank: 'Direct', months: 60, cashout: 1200000, brand: 'Ford', type: 'Performance SUV', status: 'Brand New', demand: 'low', mileage: 0, year: 2026, issues: [], documents: true, photos: 10 },
         { id: 24, model: '2026 Nissan Terra VL 4x2 A/T', monthly: 45800, bank: 'Direct', months: 56, cashout: 350000, brand: 'Nissan', type: 'SUV', status: 'Assume Balance', demand: 'medium', mileage: 15000, year: 2025, issues: ['AC needs service'], documents: false, photos: 3 },
-        { id: 25, model: '2026 Toyota Hiace GL Grandia A/T', monthly: 49890, bank: 'Direct', months: 57, cashout: 608000, brand: 'Toyota', type: 'Van', status: 'Assume Balance', demand: 'medium', mileage: 22000, year: 2024, issues: ['Rear bumper damage', 'Engine warning light'], documents: true, photos: 4 },
-        { id: 26, model: '2021 Mitsubishi Montero GLX M/T', monthly: 35352, bank: 'SAFC', months: 21, cashout: 195000, brand: 'Mitsubishi', type: 'SUV', status: 'Assume Balance', demand: 'medium', mileage: 51000, year: 2021, issues: ['High mileage', 'Rear window stuck'], documents: true, photos: 5 },
-        { id: 27, model: '2025 Dongfeng Forthing U-Tour 1.5T Luxury A/T', monthly: 28608, bank: 'Direct', months: 42, cashout: 190000, brand: 'Dongfeng', type: 'SUV', status: 'Assume Balance', demand: 'medium', mileage: 8200, year: 2025, issues: [], documents: false, photos: 3 },
-        { id: 28, model: '2025 Mitsubishi Montero Sport GLX M/T', monthly: 29000, bank: 'EastWest', months: 45, cashout: 0, brand: 'Mitsubishi', type: 'SUV', status: 'Assume Balance', demand: 'high', mileage: 6500, year: 2025, issues: [], documents: true, photos: 9 },
-        { id: 29, model: '2022 Geely Emgrand Comfort A/T', monthly: 19367, bank: 'Direct', months: 18, cashout: 150000, brand: 'Geely', type: 'Sedan', status: 'Assume Balance', demand: 'medium', mileage: 38000, year: 2022, issues: ['Minor issues listed'], documents: true, photos: 4 },
-        { id: 30, model: '2026 Mitsubishi Triton GLX A/T', monthly: 29000, bank: 'Direct', months: 56, cashout: 220000, brand: 'Mitsubishi', type: 'Pickup', status: 'Assume Balance', demand: 'high', mileage: 5600, year: 2025, issues: [], documents: true, photos: 8 }
+        { id: 25, model: '2026 Toyota Hiace GL Grandia A/T', monthly: 49890, bank: 'Direct', months: 57, cashout: 608000, brand: 'Toyota', type: 'Van', status: 'Assume Balance', demand: 'medium', mileage: 22000, year: 2024, issues: ['Rear bumper damage', 'Engine warning light'], documents: true, photos: 4 }
       ];
 
-      const [selectedVehicle, setSelectedVehicle] = useState(vehicleData[0]);
+      const [vehicleList, setVehicleList] = useState(initialVehicles);
+      const [selectedVehicle, setSelectedVehicle] = useState(initialVehicles[0]);
+      const [activeTab, setActiveTab] = useState('detector'); // 'detector', 'browse', 'seller'
+      const [searchQuery, setSearchQuery] = useState('');
+      const [riskFilter, setRiskFilter] = useState('all');
       const [sortBy, setSortBy] = useState('score');
 
+      // Calculate quality score
       const calculateQualityScore = (vehicle) => {
         let score = 100;
         let flags = [];
@@ -90,29 +78,7 @@
           flags.push({ severity: 'medium', message: 'Could add more photos for better appeal', impact: 5 });
         }
 
-        const avgPriceForType = vehicleData
-          .filter(v => v.type === vehicle.type)
-          .reduce((a, b) => a + b.monthly, 0) / vehicleData.filter(v => v.type === vehicle.type).length;
-
-        const priceDeviation = Math.abs(vehicle.monthly - avgPriceForType) / avgPriceForType;
-        if (priceDeviation > 0.25) {
-          score -= 10;
-          flags.push({ severity: 'high', message: `Price ${vehicle.monthly < avgPriceForType ? 'suspiciously low' : 'above market'} (${(priceDeviation * 100).toFixed(0)}% deviation)`, impact: 10 });
-        }
-
-        const yearsOld = new Date().getFullYear() - vehicle.year;
-        const expectedMileage = yearsOld * 15000;
-        const mileageRatio = expectedMileage > 0 ? vehicle.mileage / expectedMileage : 0;
-
-        if (vehicle.mileage > 0 && mileageRatio > 1.5) {
-          score -= 12;
-          flags.push({ severity: 'high', message: `High mileage: ${vehicle.mileage.toLocaleString()}km (${(mileageRatio * 100).toFixed(0)}% above expected)`, impact: 12 });
-        } else if (vehicle.mileage > 0 && mileageRatio > 1.2) {
-          score -= 5;
-          flags.push({ severity: 'medium', message: `Mileage slightly above average`, impact: 5 });
-        }
-
-        if (vehicle.issues.length > 0) {
+        if (vehicle.issues && vehicle.issues.length > 0) {
           const issueImpact = Math.min(vehicle.issues.length * 5, 15);
           score -= issueImpact;
           vehicle.issues.forEach(issue => {
@@ -120,269 +86,284 @@
           });
         }
 
-        if (vehicle.status === 'For Release' && vehicle.documents === false) {
-          score -= 8;
-          flags.push({ severity: 'medium', message: 'For Release status but no docs uploaded yet', impact: 8 });
-        }
-
-        if (!vehicle.bank || vehicle.bank === 'Direct' && vehicle.status === 'For Release') {
-          score -= 3;
-          flags.push({ severity: 'low', message: 'Direct financing - verify legitimacy', impact: 3 });
-        }
-
         return {
           score: Math.max(0, score),
-          flags: flags.sort((a, b) => {
-            const severity = { critical: 3, high: 2, medium: 1, low: 0 };
-            return severity[b.severity] - severity[a.severity];
-          })
+          flags: flags.sort((a, b) => (b.impact - a.impact))
         };
       };
 
       const qualityData = useMemo(() => calculateQualityScore(selectedVehicle), [selectedVehicle]);
 
-      const getStatusText = (score) => {
-        if (score >= 90) return '✅ HIGHLY TRUSTWORTHY';
-        if (score >= 75) return '✓ RELIABLE';
-        if (score >= 60) return '⚠️ CAUTION';
-        return '❌ HIGH RISK';
+      // Filtered & Sorted list
+      const processedVehicles = useMemo(() => {
+        return vehicleList
+          .map(v => ({ ...v, quality: calculateQualityScore(v) }))
+          .filter(v => {
+            const matchesSearch = v.model.toLowerCase().includes(searchQuery.toLowerCase()) || v.brand.toLowerCase().includes(searchQuery.toLowerCase());
+            if (riskFilter === 'high') return matchesSearch && v.quality.score >= 90;
+            if (riskFilter === 'medium') return matchesSearch && v.quality.score >= 60 && v.quality.score < 90;
+            if (riskFilter === 'low') return matchesSearch && v.quality.score < 60;
+            return matchesSearch;
+          })
+          .sort((a, b) => sortBy === 'score' ? b.quality.score - a.quality.score : a.quality.score - b.quality.score);
+      }, [vehicleList, searchQuery, riskFilter, sortBy]);
+
+      // Handle document toggle simulator
+      const toggleDocuments = (id) => {
+        setVehicleList(prev => prev.map(v => v.id === id ? { ...v, documents: !v.documents } : v));
+        if (selectedVehicle.id === id) {
+          setSelectedVehicle(prev => ({ ...prev, documents: !prev.documents }));
+        }
       };
 
-      const sortedVehicles = useMemo(() => {
-        const withScores = vehicleData.map(v => ({
-          ...v,
-          quality: calculateQualityScore(v)
-        }));
-
-        if (sortBy === 'score') return withScores.sort((a, b) => b.quality.score - a.quality.score);
-        if (sortBy === 'risk') return withScores.sort((a, b) => a.quality.score - b.quality.score);
-        return withScores;
-      }, [sortBy]);
+      // Handle photos add simulator
+      const addPhotos = (id) => {
+        setVehicleList(prev => prev.map(v => v.id === id ? { ...v, photos: v.photos + 2 } : v));
+        if (selectedVehicle.id === id) {
+          setSelectedVehicle(prev => ({ ...prev, photos: prev.photos + 2 }));
+        }
+      };
 
       return (
-        <div className="min-h-screen bg-gradient-to-br from-red-900 via-slate-900 to-slate-900 p-4 md:p-8 text-white">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-                <Icon name="shield" size={40} className="text-red-400" />
-                Fraud Detection & Quality Scoring
-              </h1>
-              <p className="text-slate-400">AI-Powered Trust & Credibility Analysis for Every Listing</p>
-            </div>
-
-            {/* Selected Vehicle Detail View */}
-            <div className="mb-8">
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-6">
-                <label className="block text-sm font-semibold text-white mb-3">
-                  Analyze Listing Quality
-                </label>
-                <select 
-                  value={selectedVehicle.id} 
-                  onChange={(e) => setSelectedVehicle(vehicleData.find(v => v.id === parseInt(e.target.value)))}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-400"
-                >
-                  {vehicleData.map(vehicle => (
-                    <option key={vehicle.id} value={vehicle.id}>
-                      {vehicle.model} — Score: {calculateQualityScore(vehicle).score}/100
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Quality Score Card */}
-              <div className={`border rounded-lg p-8 mb-6 ${
-                qualityData.score >= 90 ? 'bg-emerald-900/30 border-emerald-600/30' :
-                qualityData.score >= 75 ? 'bg-blue-900/30 border-blue-600/30' :
-                qualityData.score >= 60 ? 'bg-amber-900/30 border-amber-600/30' :
-                'bg-red-900/30 border-red-600/30'
-              }`}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div>
-                    <p className="text-slate-400 text-sm mb-2">QUALITY SCORE</p>
-                    <p className={`text-6xl font-bold mb-3 ${
-                      qualityData.score >= 90 ? 'text-emerald-400' :
-                      qualityData.score >= 75 ? 'text-blue-400' :
-                      qualityData.score >= 60 ? 'text-amber-400' :
-                      'text-red-400'
-                    }`}>
-                      {qualityData.score}
-                    </p>
-                    <p className={`text-lg font-bold ${
-                      qualityData.score >= 90 ? 'text-emerald-400' :
-                      qualityData.score >= 75 ? 'text-blue-400' :
-                      qualityData.score >= 60 ? 'text-amber-400' :
-                      'text-red-400'
-                    }`}>
-                      {getStatusText(qualityData.score)}
-                    </p>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <h3 className="text-xl font-bold text-white mb-4">Listing Assessment</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className={`${selectedVehicle.documents ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {selectedVehicle.documents ? '✓' : '✗'}
-                        </span>
-                        <span className="text-slate-300">Documents: {selectedVehicle.documents ? 'Attached' : 'Missing'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`${selectedVehicle.photos >= 6 ? 'text-emerald-400' : selectedVehicle.photos >= 5 ? 'text-blue-400' : 'text-amber-400'}`}>
-                          {selectedVehicle.photos >= 6 ? '✓' : '◐'}
-                        </span>
-                        <span className="text-slate-300">Photos: {selectedVehicle.photos} uploaded</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`${selectedVehicle.issues.length === 0 ? 'text-emerald-400' : 'text-orange-400'}`}>
-                          {selectedVehicle.issues.length === 0 ? '✓' : '!'}
-                        </span>
-                        <span className="text-slate-300">Issues: {selectedVehicle.issues.length === 0 ? 'None reported' : selectedVehicle.issues.length + ' issue(s)'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-blue-400">●</span>
-                        <span className="text-slate-300">Status: {selectedVehicle.status}</span>
-                      </div>
-                    </div>
-                  </div>
+        <div className="min-h-screen bg-slate-900 text-white font-sans">
+          
+          {/* Top Navbar */}
+          <nav className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+              <div className="flex items-center gap-3">
+                <Icon name="shield" size={32} className="text-red-500" />
+                <div>
+                  <h1 className="font-bold text-xl leading-none text-white">Pasalo Cars PH</h1>
+                  <span className="text-xs text-red-400 font-medium">Trust & Verification Engine</span>
                 </div>
               </div>
 
-              {/* Red Flags */}
-              {qualityData.flags.length > 0 && (
-                <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-bold text-red-300 mb-4 flex items-center gap-2">
-                    <Icon name="flag" size={24} />
-                    🚩 Risk Flags & Warnings
-                  </h3>
-                  <div className="space-y-3">
-                    {qualityData.flags.map((flag, idx) => (
-                      <div key={idx} className={`p-3 rounded-lg border ${
-                        flag.severity === 'critical' ? 'bg-red-900/30 border-red-600/50' :
-                        flag.severity === 'high' ? 'bg-orange-900/30 border-orange-600/50' :
-                        flag.severity === 'medium' ? 'bg-amber-900/30 border-amber-600/50' :
-                        'bg-blue-900/30 border-blue-600/50'
-                      }`}>
-                        <div className="flex items-start gap-2">
-                          <Icon name="alert-triangle" size={18} className={
-                            flag.severity === 'critical' ? 'text-red-400' :
-                            flag.severity === 'high' ? 'text-orange-400' :
-                            flag.severity === 'medium' ? 'text-amber-400' :
-                            'text-blue-400'
-                          } style={{ marginTop: '2px' }} />
-                          <div>
-                            <p className="text-white font-semibold">{flag.message}</p>
-                            <p className="text-sm text-slate-400 mt-1">Impact: -{flag.impact} points</p>
-                          </div>
-                        </div>
-                      </div>
+              {/* Navigation Tabs */}
+              <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
+                <button 
+                  onClick={() => setActiveTab('detector')}
+                  className={`px-4 py-1.5 rounded-md text-sm font-semibold transition ${activeTab === 'detector' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                >
+                  🛡️ Fraud Detector
+                </button>
+                <button 
+                  onClick={() => setActiveTab('browse')}
+                  className={`px-4 py-1.5 rounded-md text-sm font-semibold transition ${activeTab === 'browse' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                >
+                  🔍 Market Search
+                </button>
+                <button 
+                  onClick={() => setActiveTab('seller')}
+                  className={`px-4 py-1.5 rounded-md text-sm font-semibold transition ${activeTab === 'seller' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                >
+                  ⚡ Seller Boost
+                </button>
+              </div>
+            </div>
+          </nav>
+
+          <main className="max-w-7xl mx-auto p-4 md:p-8">
+
+            {/* TAB 1: FRAUD DETECTOR */}
+            {activeTab === 'detector' && (
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold mb-1">Listing Trust & Fraud Analysis</h2>
+                  <p className="text-slate-400 text-sm">Select a vehicle to inspect system-identified risk factors.</p>
+                </div>
+
+                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                    Select Vehicle to Inspect
+                  </label>
+                  <select 
+                    value={selectedVehicle.id} 
+                    onChange={(e) => setSelectedVehicle(vehicleList.find(v => v.id === parseInt(e.target.value)))}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500"
+                  >
+                    {vehicleList.map(v => (
+                      <option key={v.id} value={v.id}>
+                        {v.model} — Trust Score: {calculateQualityScore(v).score}/100
+                      </option>
                     ))}
-                  </div>
+                  </select>
                 </div>
-              )}
 
-              {/* Recommendations */}
-              <div className="bg-blue-900/20 border border-blue-600/30 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-blue-300 mb-4 flex items-center gap-2">
-                  <Icon name="zap" size={24} />
-                  💡 Seller Recommendations
-                </h3>
-                <div className="space-y-2 text-sm text-slate-300">
-                  {qualityData.score < 90 && selectedVehicle.documents && !selectedVehicle.issues.length ? (
-                    <React.Fragment>
-                      <p>✓ Add 2-3 more high-quality photos to boost score to 95+</p>
-                      <p>✓ Highlight vehicle features in detailed description</p>
-                    </React.Fragment>
-                  ) : null}
-                  {!selectedVehicle.documents ? (
-                    <p className="font-semibold text-red-400">⚠️ CRITICAL: Upload official documents to unlock buyer trust (could boost score by 20 points)</p>
-                  ) : null}
-                  {selectedVehicle.photos < 6 ? (
-                    <p>✓ Add more photos (especially interior, engine bay, undercarriage)</p>
-                  ) : null}
-                  {selectedVehicle.issues.length > 0 ? (
-                    <p className="text-amber-400">⚠️ Consider adding inspection report to address listed issues</p>
-                  ) : null}
-                  <p className="mt-3 pt-3 border-t border-slate-700 font-semibold text-white">
-                    Potential Score Improvement: {100 - qualityData.score} points available
-                  </p>
-                </div>
-              </div>
-            </div>
+                {/* Quality Score Card */}
+                <div className={`border rounded-xl p-6 mb-6 ${
+                  qualityData.score >= 90 ? 'bg-emerald-950/40 border-emerald-600/40' :
+                  qualityData.score >= 60 ? 'bg-amber-950/40 border-amber-600/40' :
+                  'bg-red-950/40 border-red-600/40'
+                }`}>
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                      <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Trust Score</p>
+                      <span className={`text-6xl font-black ${
+                        qualityData.score >= 90 ? 'text-emerald-400' :
+                        qualityData.score >= 60 ? 'text-amber-400' : 'text-red-400'
+                      }`}>{qualityData.score}</span>
+                      <span className="text-2xl font-bold text-slate-500"> / 100</span>
+                    </div>
 
-            {/* Market Dashboard */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Market Trust Dashboard</h2>
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm"
-                >
-                  <option value="score">Sort by Quality (Best First)</option>
-                  <option value="risk">Sort by Risk (Risky First)</option>
-                </select>
-              </div>
-
-              <div className="space-y-3">
-                {sortedVehicles.slice(0, 10).map((vehicle) => (
-                  <div key={vehicle.id} className={`border rounded-lg p-4 ${
-                    vehicle.quality.score >= 90 ? 'bg-emerald-900/10 border-emerald-600/30' :
-                    vehicle.quality.score >= 75 ? 'bg-blue-900/10 border-blue-600/30' :
-                    vehicle.quality.score >= 60 ? 'bg-amber-900/10 border-amber-600/30' :
-                    'bg-red-900/10 border-red-600/30'
-                  }`}>
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-                      <div>
-                        <p className="text-sm font-semibold text-white">{vehicle.model.substring(0, 30)}</p>
-                        <p className="text-xs text-slate-400 mt-1">{vehicle.status}</p>
-                      </div>
-                      
-                      <div>
-                        <p className="text-sm text-slate-400">Documents</p>
-                        <p className="text-lg font-bold text-white">{vehicle.documents ? '✓' : '✗'}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-slate-400">Photos</p>
-                        <p className="text-lg font-bold text-white">{vehicle.photos}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-slate-400">Issues</p>
-                        <p className={`text-lg font-bold ${vehicle.issues.length > 0 ? 'text-orange-400' : 'text-emerald-400'}`}>
-                          {vehicle.issues.length === 0 ? 'None' : vehicle.issues.length}
-                        </p>
-                      </div>
-
-                      <div className="text-right">
-                        <p className={`text-3xl font-bold ${
-                          vehicle.quality.score >= 90 ? 'text-emerald-400' :
-                          vehicle.quality.score >= 75 ? 'text-blue-400' :
-                          vehicle.quality.score >= 60 ? 'text-amber-400' :
-                          'text-red-400'
-                        }`}>
-                          {vehicle.quality.score}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">Quality Score</p>
-                      </div>
+                    <div className="space-y-2 text-sm text-slate-300">
+                      <p className="flex items-center gap-2">
+                        <span>{selectedVehicle.documents ? '✅' : '❌'}</span>
+                        <span>OR/CR & Financing Papers: <strong>{selectedVehicle.documents ? 'Verified Attached' : 'Missing Documents'}</strong></span>
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <span>{selectedVehicle.photos >= 6 ? '✅' : '⚠️'}</span>
+                        <span>Photos Uploaded: <strong>{selectedVehicle.photos} photos</strong></span>
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <span>{selectedVehicle.issues.length === 0 ? '✅' : '⚠️'}</span>
+                        <span>Reported Issues: <strong>{selectedVehicle.issues.length === 0 ? 'None' : selectedVehicle.issues.join(', ')}</strong></span>
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Footer */}
-            <div className="text-center text-slate-500 text-sm border-t border-slate-700 pt-8">
-              <p>Fraud Detection & Quality Scoring v1.0 | Pasalo Cars PH Trust Engine</p>
-              <p className="mt-2">{vehicleData.length} vehicles analyzed | AI-powered credibility assessment</p>
-            </div>
-          </div>
+                {/* Risk Flags */}
+                {qualityData.flags.length > 0 && (
+                  <div className="bg-red-950/30 border border-red-800/50 rounded-xl p-6 mb-6">
+                    <h3 className="text-red-400 font-bold mb-4 flex items-center gap-2">
+                      <Icon name="alert-triangle" size={20} />
+                      Risk Flags & Fraud Alerts
+                    </h3>
+                    <div className="space-y-3">
+                      {qualityData.flags.map((flag, idx) => (
+                        <div key={idx} className="bg-red-900/30 border border-red-700/40 p-3 rounded-lg flex justify-between items-center text-sm">
+                          <span className="font-semibold">{flag.message}</span>
+                          <span className="text-red-400 font-bold">-{flag.impact} pts</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 2: MARKET SEARCH & FILTER */}
+            {activeTab === 'browse' && (
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold mb-1">Marketplace Listings</h2>
+                  <p className="text-slate-400 text-sm">Filter listings by risk status and keywords.</p>
+                </div>
+
+                {/* Search & Filter Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <input 
+                    type="text" 
+                    placeholder="Search by brand or model..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                  />
+
+                  <select 
+                    value={riskFilter} 
+                    onChange={(e) => setRiskFilter(e.target.value)}
+                    className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                  >
+                    <option value="all">All Risk Levels</option>
+                    <option value="high">🟢 Verified (90+ Score)</option>
+                    <option value="medium">🟡 Caution (60-89 Score)</option>
+                    <option value="low">🔴 High Risk (&lt;60 Score)</option>
+                  </select>
+
+                  <select 
+                    value={sortBy} 
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                  >
+                    <option value="score">Sort by Quality Score (High to Low)</option>
+                    <option value="risk">Sort by Risk (Low Score First)</option>
+                  </select>
+                </div>
+
+                {/* Listings Grid */}
+                <div className="grid grid-cols-1 gap-3">
+                  {processedVehicles.map((v) => (
+                    <div key={v.id} className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <div>
+                        <h4 className="font-bold text-lg text-white">{v.model}</h4>
+                        <p className="text-xs text-slate-400">Monthly: ₱{v.monthly.toLocaleString()} | Bank: {v.bank} | Status: {v.status}</p>
+                      </div>
+
+                      <div className="flex items-center gap-4 self-end md:self-auto">
+                        <div className="text-right">
+                          <span className={`text-2xl font-black ${
+                            v.quality.score >= 90 ? 'text-emerald-400' :
+                            v.quality.score >= 60 ? 'text-amber-400' : 'text-red-400'
+                          }`}>{v.quality.score}</span>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase">Trust Score</p>
+                        </div>
+                        <button 
+                          onClick={() => { setSelectedVehicle(v); setActiveTab('detector'); }}
+                          className="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-semibold"
+                        >
+                          Inspect
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: SELLER SCORE BOOST SIMULATOR */}
+            {activeTab === 'seller' && (
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold mb-1">Seller Score Improvement Simulator</h2>
+                  <p className="text-slate-400 text-sm">See how adding documents and photos directly boosts your listing score in real-time.</p>
+                </div>
+
+                <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                  <h3 className="font-bold text-lg mb-2">{selectedVehicle.model}</h3>
+                  <p className="text-sm text-slate-400 mb-6">Current Trust Score: <strong className="text-red-400">{qualityData.score}/100</strong></p>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700">
+                      <div>
+                        <p className="font-semibold text-sm">Official Documents (OR/CR & ID)</p>
+                        <p className="text-xs text-slate-400">{selectedVehicle.documents ? 'Attached (+20 pts)' : 'Missing (-20 pts penalty)'}</p>
+                      </div>
+                      <button 
+                        onClick={() => toggleDocuments(selectedVehicle.id)}
+                        className={`px-4 py-2 rounded-lg text-xs font-bold ${selectedVehicle.documents ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-red-600 hover:bg-red-500'}`}
+                      >
+                        {selectedVehicle.documents ? 'Attached (Click to Remove)' : 'Upload Documents (+20 pts)'}
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700">
+                      <div>
+                        <p className="font-semibold text-sm">Vehicle Photo Gallery</p>
+                        <p className="text-xs text-slate-400">Currently: {selectedVehicle.photos} Photos uploaded</p>
+                      </div>
+                      <button 
+                        onClick={() => addPhotos(selectedVehicle.id)}
+                        className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-xs font-bold"
+                      >
+                        Add +2 Photos (+15 pts)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </main>
+
+          <footer className="text-center text-slate-500 text-xs py-8 border-t border-slate-800">
+            Pasalo Cars PH Platform Engine © 2026 | Built for High-Trust Auto Marketplace
+          </footer>
         </div>
       );
     };
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<FraudDetectionScoring />);
+    ReactDOM.createRoot(document.getElementById('root')).render(<PasaloPlatformApp />);
   </script>
 </body>
 </html>
