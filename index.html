@@ -10,16 +10,27 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Lucide Icons (Kailangan para sa mga icons mula sa Claude) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-gray-100 p-6">
   <div id="root"></div>
 
   <script type="text/babel">
+    // 1. I-paste dito ang code ng buyer-seller-matcher (alisin ang import/export lines)
+    function BuyerSellerMatcher() {
+      return (
+        <div>
+          {/* Code mula sa buyer-seller-matcher.tsx */}
+        </div>
+      );
+    }
+
+    // 2. Main App Component
     function App() {
       return (
-        <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md text-center space-y-4">
-          <h1 className="text-3xl font-bold text-gray-800">Buyer-Seller Matcher</h1>
-          <p className="text-gray-600">Successfully Deployed to Vercel!</p>
+        <div className="max-w-6xl mx-auto space-y-8">
+          <BuyerSellerMatcher />
         </div>
       );
     }
