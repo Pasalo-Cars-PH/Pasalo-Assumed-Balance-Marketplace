@@ -1,221 +1,281 @@
 import React, { useState, useMemo } from 'react';
-import { Users, Target, Zap, TrendingUp, AlertCircle, CheckCircle, Heart, MapPin, DollarSign } from 'lucide-react';
 
-const BuyerSellerMatcher = () => {
-  const vehicleData = [
-    { id: 1, model: '2026 Toyota Fortuner G A/T', monthly: 38767, bank: 'TFS', months: 60, cashout: 0, brand: 'Toyota', type: 'SUV', status: 'Brand New', demand: 'high' },
-    { id: 2, model: '2026 Ford Everest Titanium 4x2', monthly: 47000, bank: 'BPI', months: 60, cashout: 0, brand: 'Ford', type: 'SUV', status: 'For Release', demand: 'high' },
-    { id: 3, model: '2026 Toyota Raize G A/T', monthly: 18639, bank: 'TFS', months: 60, cashout: 180000, brand: 'Toyota', type: 'SUV', status: 'Brand New', demand: 'very_high' },
-    { id: 4, model: '2026 Toyota Land Cruiser 300 ZX', monthly: 122000, bank: 'Direct', months: 60, cashout: 0, brand: 'Toyota', type: 'Full-Size SUV', status: 'Brand New', demand: 'medium' },
-    { id: 5, model: '2026 Nissan Patrol 3.5L V6 4x4 A/T', monthly: 111099, bank: 'Direct', months: 60, cashout: 0, brand: 'Nissan', type: 'Full-Size SUV', status: 'Brand New', demand: 'medium' },
-    { id: 6, model: '2026 Hilux Tamaraw FX DSL M/T', monthly: 26883, bank: 'TFS', months: 60, cashout: 170000, brand: 'Toyota', type: 'Pickup', status: 'Brand New', demand: 'high' },
-    { id: 7, model: '2025 Honda Civic V CVT A/T', monthly: 33800, bank: 'BDO', months: 43, cashout: 0, brand: 'Honda', type: 'Sedan', status: 'Assume Balance', demand: 'high' },
-    { id: 8, model: '2025 Toyota Hilux GR-S 4x4 A/T', monthly: 43232, bank: 'BDO', months: 46, cashout: 0, brand: 'Toyota', type: 'Pickup', status: 'Assume Balance', demand: 'high' },
-    { id: 9, model: '2026 Mitsubishi Xpander Cross A/T', monthly: 28878, bank: 'EastWest', months: 60, cashout: 0, brand: 'Mitsubishi', type: 'MPV', status: 'For Release', demand: 'high' },
-    { id: 10, model: '2026 Toyota Wigo G CVT', monthly: 15513, bank: 'TFS', months: 60, cashout: 145000, brand: 'Toyota', type: 'Hatchback', status: 'Brand New', demand: 'very_high' },
-    { id: 11, model: '2026 Toyota Yaris Cross Hybrid', monthly: 29789, bank: 'TFS', months: 60, cashout: 0, brand: 'Toyota', type: 'Crossover', status: 'For Release', demand: 'high' },
-    { id: 12, model: '2026 Toyota Innova Zenix Q HEV', monthly: 43243, bank: 'SRP', months: 60, cashout: 0, brand: 'Toyota', type: 'MPV', status: 'For Release', demand: 'high' },
-    { id: 13, model: '2026 Ford Ranger Raptor 4x4 A/T', monthly: 54000, bank: 'BPI', months: 60, cashout: 0, brand: 'Ford', type: 'Pickup', status: 'For Release', demand: 'medium' },
-    { id: 14, model: '2025 BAIC B60 TDi Hybrid', monthly: 45357, bank: 'Direct', months: 48, cashout: 0, brand: 'BAIC', type: 'SUV', status: 'Assume Balance', demand: 'medium' },
-    { id: 15, model: '2026 Mitsubishi Montero Sport GLS', monthly: 39891, bank: 'BDO', months: 60, cashout: 0, brand: 'Mitsubishi', type: 'SUV', status: 'Brand New', demand: 'high' },
-    { id: 16, model: '2026 MG 4 AT Electric Vehicle', monthly: 27619, bank: 'Direct', months: 60, cashout: 0, brand: 'MG', type: 'Crossover', status: 'Brand New', demand: 'medium' },
-    { id: 17, model: '2026 Suzuki Ertiga Hybrid AT', monthly: 24457, bank: 'PSBank', months: 60, cashout: 0, brand: 'Suzuki', type: 'MPV', status: 'For Release', demand: 'high' },
-    { id: 18, model: '2026 Toyota Avanza E CVT', monthly: 22476, bank: 'TFS', months: 60, cashout: 0, brand: 'Toyota', type: 'MPV', status: 'Assume Balance', demand: 'high' },
-    { id: 19, model: '2026 Jetour X70 i-DM A/T', monthly: 32251, bank: 'RCBC', months: 60, cashout: 350000, brand: 'Jetour', type: 'SUV', status: 'Brand New', demand: 'medium' },
-    { id: 20, model: '2026 Toyota Avanza 1.3 E CVT', monthly: 23245, bank: 'TFS', months: 60, cashout: 170000, brand: 'Toyota', type: 'MPV', status: 'For Release', demand: 'high' },
-    { id: 21, model: '2026 MG 5 Core A/T', monthly: 15309, bank: 'Direct', months: 60, cashout: 100000, brand: 'MG', type: 'Sedan', status: 'Brand New', demand: 'high' },
-    { id: 22, model: '2026 Toyota Vios XLE CVT A/T', monthly: 17966, bank: 'TFS', months: 60, cashout: 120000, brand: 'Toyota', type: 'Sedan', status: 'Brand New', demand: 'high' },
-    { id: 23, model: '2026 Ford Mustang Mach-E A/T', monthly: 54287, bank: 'Direct', months: 60, cashout: 1200000, brand: 'Ford', type: 'Performance SUV', status: 'Brand New', demand: 'low' },
-    { id: 24, model: '2026 Nissan Terra VL 4x2 A/T', monthly: 45800, bank: 'Direct', months: 56, cashout: 350000, brand: 'Nissan', type: 'SUV', status: 'Assume Balance', demand: 'medium' },
-    { id: 25, model: '2026 Toyota Hiace GL Grandia A/T', monthly: 49890, bank: 'Direct', months: 57, cashout: 608000, brand: 'Toyota', type: 'Van', status: 'Assume Balance', demand: 'medium' },
-    { id: 26, model: '2021 Mitsubishi Montero GLX M/T', monthly: 35352, bank: 'SAFC', months: 21, cashout: 195000, brand: 'Mitsubishi', type: 'SUV', status: 'Assume Balance', demand: 'medium' },
-    { id: 27, model: '2025 Dongfeng Forthing U-Tour 1.5T Luxury A/T', monthly: 28608, bank: 'Direct', months: 42, cashout: 190000, brand: 'Dongfeng', type: 'SUV', status: 'Assume Balance', demand: 'medium' },
-    { id: 28, model: '2025 Mitsubishi Montero Sport GLX M/T', monthly: 29000, bank: 'EastWest', months: 45, cashout: 0, brand: 'Mitsubishi', type: 'SUV', status: 'Assume Balance', demand: 'high' },
-    { id: 29, model: '2022 Geely Emgrand Comfort A/T', monthly: 19367, bank: 'Direct', months: 18, cashout: 150000, brand: 'Geely', type: 'Sedan', status: 'Assume Balance', demand: 'medium' },
-    { id: 30, model: '2026 Mitsubishi Triton GLX A/T', monthly: 29000, bank: 'Direct', months: 56, cashout: 220000, brand: 'Mitsubishi', type: 'Pickup', status: 'Assume Balance', demand: 'high' }
-  ];
+interface Vehicle {
+  id: number;
+  model: string;
+  monthly: number;
+  bank: string;
+  months: number;
+  cashout: number;
+  brand: string;
+  type: string;
+  status: string;
+  demand: string;
+  mileage: number;
+  year: number;
+  issues: string[];
+  documents: boolean;
+  photos: number;
+}
 
-  const buyerProfiles = [
-    { name: 'First-Time Buyer', budgetMin: 12000, budgetMax: 25000, preference: ['Sedan', 'Hatchback', 'Crossover'], weight: 0.25 },
-    { name: 'OFW (Overseas Worker)', budgetMin: 25000, budgetMax: 50000, preference: ['SUV', 'MPV', 'Pickup'], weight: 0.30 },
-    { name: 'Family Oriented', budgetMin: 20000, budgetMax: 45000, preference: ['MPV', 'SUV', 'Crossover'], weight: 0.20 },
-    { name: 'Luxury/Premium', budgetMin: 50000, budgetMax: 150000, preference: ['Full-Size SUV', 'Performance SUV', 'Van'], weight: 0.10 },
-    { name: 'Budget Conscious', budgetMin: 10000, budgetMax: 20000, preference: ['Sedan', 'Hatchback'], weight: 0.15 },
-  ];
+const initialVehicles: Vehicle[] = [
+  { id: 1, model: '2026 Toyota Fortuner G A/T', monthly: 38767, bank: 'TFS', months: 60, cashout: 0, brand: 'Toyota', type: 'SUV', status: 'Brand New', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
+  { id: 2, model: '2026 Ford Everest Titanium 4x2', monthly: 47000, bank: 'BPI', months: 60, cashout: 0, brand: 'Ford', type: 'SUV', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 7 },
+  { id: 3, model: '2026 Toyota Raize G A/T', monthly: 18639, bank: 'TFS', months: 60, cashout: 180000, brand: 'Toyota', type: 'SUV', status: 'Brand New', demand: 'very_high', mileage: 0, year: 2026, issues: [], documents: true, photos: 9 },
+  { id: 4, model: '2026 Toyota Land Cruiser 300 ZX', monthly: 122000, bank: 'Direct', months: 60, cashout: 0, brand: 'Toyota', type: 'Full-Size SUV', status: 'Brand New', demand: 'medium', mileage: 0, year: 2026, issues: [], documents: true, photos: 10 },
+  { id: 5, model: '2026 Nissan Patrol 3.5L V6 4x4 A/T', monthly: 111099, bank: 'Direct', months: 60, cashout: 0, brand: 'Nissan', type: 'Full-Size SUV', status: 'Brand New', demand: 'medium', mileage: 0, year: 2026, issues: [], documents: true, photos: 8 },
+  { id: 6, model: '2026 Hilux Tamaraw FX DSL M/T', monthly: 26883, bank: 'TFS', months: 60, cashout: 170000, brand: 'Toyota', type: 'Pickup', status: 'Brand New', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 7 },
+  { id: 7, model: '2025 Honda Civic V CVT A/T', monthly: 33800, bank: 'BDO', months: 43, cashout: 0, brand: 'Honda', type: 'Sedan', status: 'Assume Balance', demand: 'high', mileage: 5200, year: 2025, issues: [], documents: true, photos: 6 },
+  { id: 8, model: '2025 Toyota Hilux GR-S 4x4 A/T', monthly: 43232, bank: 'BDO', months: 46, cashout: 0, brand: 'Toyota', type: 'Pickup', status: 'Assume Balance', demand: 'high', mileage: 8900, year: 2025, issues: [], documents: true, photos: 8 },
+  { id: 9, model: '2026 Mitsubishi Xpander Cross A/T', monthly: 28878, bank: 'EastWest', months: 60, cashout: 0, brand: 'Mitsubishi', type: 'MPV', status: 'For Release', demand: 'high', mileage: 0, year: 2026, issues: [], documents: true, photos: 7 },
+  { id: 10, model: '2026 Toyota Wigo G CVT', monthly: 15513, bank: 'TFS', months: 60, cashout: 145000, brand: 'Toyota', type: 'Hatchback', status: 'Brand New', demand: 'very_high', mileage: 0, year: 2026, issues: [], documents: true, photos: 9 },
+  { id: 19, model: '2026 Jetour X70 i-DM A/T', monthly: 32251, bank: 'RCBC', months: 60, cashout: 350000, brand: 'Jetour', type: 'SUV', status: 'Brand New', demand: 'medium', mileage: 0, year: 2026, issues: [], documents: false, photos: 4 },
+  { id: 24, model: '2026 Nissan Terra VL 4x2 A/T', monthly: 45800, bank: 'Direct', months: 56, cashout: 350000, brand: 'Nissan', type: 'SUV', status: 'Assume Balance', demand: 'medium', mileage: 15000, year: 2025, issues: ['AC needs service'], documents: false, photos: 3 },
+  { id: 25, model: '2026 Toyota Hiace GL Grandia A/T', monthly: 49890, bank: 'Direct', months: 57, cashout: 608000, brand: 'Toyota', type: 'Van', status: 'Assume Balance', demand: 'medium', mileage: 22000, year: 2024, issues: ['Rear bumper damage', 'Engine warning light'], documents: true, photos: 4 }
+];
 
-  const [selectedVehicle, setSelectedVehicle] = useState(vehicleData[0]);
-  const [view, setView] = useState('seller');
-  const [buyerBudget, setBuyerBudget] = useState(25000);
+export default function App() {
+  const [vehicleList, setVehicleList] = useState<Vehicle[]>(initialVehicles);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle>(initialVehicles[0]);
+  const [activeTab, setActiveTab] = useState<'detector' | 'browse' | 'seller'>('detector'); 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [riskFilter, setRiskFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('score');
 
-  const calculateBuyerMatches = (vehicle) => {
-    const matches = buyerProfiles.map(profile => {
-      const budgetMatch = vehicle.monthly >= profile.budgetMin && vehicle.monthly <= profile.budgetMax;
-      const typeMatch = profile.preference.includes(vehicle.type);
-      
-      let score = 0;
-      if (budgetMatch) score += 40;
-      if (typeMatch) score += 30;
-      if (vehicle.demand === 'very_high' || vehicle.demand === 'high') score += 20;
-      if (vehicle.status === 'Brand New') score += 10;
-      
-      const estimatedBuyers = Math.floor(Math.random() * 15) + 5;
-      
-      return {
-        profile: profile.name,
-        score: Math.min(100, score),
-        budgetMatch,
-        typeMatch,
-        estimatedBuyers: Math.floor(estimatedBuyers * profile.weight * 100),
-        budgetMin: profile.budgetMin,
-        budgetMax: profile.budgetMax,
-      };
-    });
+  const calculateQualityScore = (vehicle: Vehicle) => {
+    let score = 100;
+    let flags: { severity: string; message: string; impact: number }[] = [];
 
-    return matches.sort((a, b) => b.score - a.score);
+    if (!vehicle.documents) {
+      score -= 20;
+      flags.push({ severity: 'critical', message: 'Missing documentation (docs not attached)', impact: 20 });
+    }
+
+    if (vehicle.photos < 5) {
+      score -= 15;
+      flags.push({ severity: 'high', message: `Insufficient photos (${vehicle.photos} vs 6+ recommended)`, impact: 15 });
+    } else if (vehicle.photos < 6) {
+      score -= 5;
+      flags.push({ severity: 'medium', message: 'Could add more photos for better appeal', impact: 5 });
+    }
+
+    if (vehicle.issues && vehicle.issues.length > 0) {
+      const issueImpact = Math.min(vehicle.issues.length * 5, 15);
+      score -= issueImpact;
+      vehicle.issues.forEach(issue => {
+        flags.push({ severity: 'medium', message: `Issue reported: ${issue}`, impact: 5 });
+      });
+    }
+
+    return {
+      score: Math.max(0, score),
+      flags: flags.sort((a, b) => (b.impact - a.impact))
+    };
   };
 
-  const buyerMatches = useMemo(() => calculateBuyerMatches(selectedVehicle), [selectedVehicle]);
+  const qualityData = useMemo(() => calculateQualityScore(selectedVehicle), [selectedVehicle]);
 
-  const vehiclesForBuyer = useMemo(() => {
-    return vehicleData
-      .filter(v => v.monthly <= buyerBudget + 3000 && v.monthly >= buyerBudget - 3000)
-      .map(v => {
-        let matchScore = 50;
-        const priceDiff = Math.abs(v.monthly - buyerBudget);
-        matchScore += Math.max(0, 30 - (priceDiff / 100));
-        if (v.demand === 'very_high' || v.demand === 'high') matchScore += 15;
-        if (v.status === 'Brand New') matchScore += 5;
-        
-        return {
-          ...v,
-          matchScore: Math.min(100, Math.round(matchScore)),
-          relevance: Math.abs(v.monthly - buyerBudget) <= 1000 ? 'EXACT MATCH' : Math.abs(v.monthly - buyerBudget) <= 3000 ? 'CLOSE MATCH' : 'ALTERNATIVE'
-        };
+  const processedVehicles = useMemo(() => {
+    return vehicleList
+      .map(v => ({ ...v, quality: calculateQualityScore(v) }))
+      .filter(v => {
+        const matchesSearch = v.model.toLowerCase().includes(searchQuery.toLowerCase()) || v.brand.toLowerCase().includes(searchQuery.toLowerCase());
+        if (riskFilter === 'high') return matchesSearch && v.quality.score >= 90;
+        if (riskFilter === 'medium') return matchesSearch && v.quality.score >= 60 && v.quality.score < 90;
+        if (riskFilter === 'low') return matchesSearch && v.quality.score < 60;
+        return matchesSearch;
       })
-      .sort((a, b) => b.matchScore - a.matchScore);
-  }, [buyerBudget]);
+      .sort((a, b) => sortBy === 'score' ? b.quality.score - a.quality.score : a.quality.score - b.quality.score);
+  }, [vehicleList, searchQuery, riskFilter, sortBy]);
 
-  const totalBuyerEstimate = buyerMatches.reduce((sum, m) => sum + m.estimatedBuyers, 0);
+  const toggleDocuments = (id: number) => {
+    setVehicleList(prev => prev.map(v => v.id === id ? { ...v, documents: !v.documents } : v));
+    if (selectedVehicle.id === id) {
+      setSelectedVehicle(prev => ({ ...prev, documents: !prev.documents }));
+    }
+  };
+
+  const addPhotos = (id: number) => {
+    setVehicleList(prev => prev.map(v => v.id === id ? { ...v, photos: v.photos + 2 } : v));
+    if (selectedVehicle.id === id) {
+      setSelectedVehicle(prev => ({ ...prev, photos: prev.photos + 2 }));
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-slate-900 to-slate-900 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-            <Users className="text-blue-400" size={40} />
-            AI Buyer-Seller Matcher
-          </h1>
-          <p className="text-slate-400">Connect your vehicles to the right buyers instantly</p>
-        </div>
+    <div className="min-h-screen bg-slate-900 text-white font-sans">
+      <nav className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <div className="bg-red-500/20 p-2 rounded-lg border border-red-500/30 text-red-500 font-bold text-xl">
+              🛡️
+            </div>
+            <div>
+              <h1 className="font-bold text-xl leading-none text-white">Pasalo Cars PH</h1>
+              <span className="text-xs text-emerald-400 font-bold">✨ Updated v2.0</span>
+            </div>
+          </div>
 
-        <div className="flex gap-4 mb-8">
-          <button
-            onClick={() => setView('seller')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              view === 'seller'
-                ? 'bg-blue-500 text-white shadow-lg'
-                : 'bg-slate-800 text-slate-300 border border-slate-700 hover:border-blue-500'
-            }`}
-          >
-            🚗 Seller View
-          </button>
-          <button
-            onClick={() => setView('buyer')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              view === 'buyer'
-                ? 'bg-blue-500 text-white shadow-lg'
-                : 'bg-slate-800 text-slate-300 border border-slate-700 hover:border-blue-500'
-            }`}
-          >
-            👤 Buyer View
-          </button>
+          <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-700 w-full sm:w-auto justify-center">
+            <button 
+              onClick={() => setActiveTab('detector')}
+              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition ${activeTab === 'detector' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}`}
+            >
+              🛡️ Fraud Detector
+            </button>
+            <button 
+              onClick={() => setActiveTab('browse')}
+              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition ${activeTab === 'browse' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}`}
+            >
+              🔍 Market Search
+            </button>
+            <button 
+              onClick={() => setActiveTab('seller')}
+              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition ${activeTab === 'seller' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}`}
+            >
+              ⚡ Seller Boost
+            </button>
+          </div>
         </div>
+      </nav>
 
-        {view === 'seller' && (
-          <div className="space-y-8">
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-              <label className="block text-sm font-semibold text-white mb-3">
-                Select Vehicle to Find Buyers
+      <main className="max-w-7xl mx-auto p-4 md:p-8">
+        {activeTab === 'detector' && (
+          <div>
+            <div className="mb-4">
+              <h2 className="text-xl md:text-2xl font-bold mb-1">Listing Trust & Fraud Analysis</h2>
+              <p className="text-slate-400 text-xs md:text-sm">Select a vehicle to inspect system-identified risk factors.</p>
+            </div>
+
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                Select Vehicle to Inspect
               </label>
               <select 
                 value={selectedVehicle.id} 
-                onChange={(e) => setSelectedVehicle(vehicleData.find(v => v.id === parseInt(e.target.value)))}
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-400"
+                onChange={(e) => {
+                  const found = vehicleList.find(v => v.id === parseInt(e.target.value));
+                  if (found) setSelectedVehicle(found);
+                }}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-red-500 truncate"
               >
-                {vehicleData.map(vehicle => (
-                  <option key={vehicle.id} value={vehicle.id}>
-                    {vehicle.model} — ₱{vehicle.monthly.toLocaleString()}/mo
+                {vehicleList.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {v.model} (Score: {calculateQualityScore(v).score})
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-blue-900/30 border border-blue-600/30 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">TOTAL BUYER MATCHES</p>
-                <p className="text-3xl font-bold text-blue-300">{totalBuyerEstimate}</p>
-                <p className="text-xs text-slate-500 mt-2">Active inquiries possible</p>
-              </div>
-              <div className="bg-emerald-900/30 border border-emerald-600/30 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">BEST MATCH SEGMENT</p>
-                <p className="text-xl font-bold text-emerald-300">{buyerMatches[0]?.profile}</p>
-                <p className="text-xs text-slate-500 mt-2">{buyerMatches[0]?.score}% match score</p>
-              </div>
-              <div className="bg-purple-900/30 border border-purple-600/30 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">VEHICLE PRICE</p>
-                <p className="text-lg font-bold text-purple-300">₱{selectedVehicle.monthly.toLocaleString()}/mo</p>
-                <p className="text-xs text-slate-500 mt-2">{selectedVehicle.status}</p>
-              </div>
-              <div className="bg-orange-900/30 border border-orange-600/30 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">INQUIRY RATE</p>
-                <p className="text-3xl font-bold text-orange-300">
-                  {selectedVehicle.demand === 'very_high' ? '↑ HIGH' : selectedVehicle.demand === 'high' ? '→ GOOD' : '↓ LOW'}
-                </p>
+            <div className={`border rounded-xl p-5 md:p-6 mb-6 ${
+              qualityData.score >= 90 ? 'bg-emerald-950/40 border-emerald-600/40' :
+              qualityData.score >= 60 ? 'bg-amber-950/40 border-amber-600/40' :
+              'bg-red-950/40 border-red-600/40'
+            }`}>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Trust Score</p>
+                  <span className={`text-5xl md:text-6xl font-black ${
+                    qualityData.score >= 90 ? 'text-emerald-400' :
+                    qualityData.score >= 60 ? 'text-amber-400' : 'text-red-400'
+                  }`}>{qualityData.score}</span>
+                  <span className="text-xl md:text-2xl font-bold text-slate-500"> / 100</span>
+                </div>
+
+                <div className="space-y-2 text-xs md:text-sm text-slate-300">
+                  <p className="flex items-center gap-2">
+                    <span>{selectedVehicle.documents ? '✅' : '❌'}</span>
+                    <span>OR/CR & Financing Papers: <strong>{selectedVehicle.documents ? 'Verified Attached' : 'Missing Documents'}</strong></span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span>{selectedVehicle.photos >= 6 ? '✅' : '⚠️'}</span>
+                    <span>Photos Uploaded: <strong>{selectedVehicle.photos} photos</strong></span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span>{selectedVehicle.issues.length === 0 ? '✅' : '⚠️'}</span>
+                    <span>Reported Issues: <strong>{selectedVehicle.issues.length === 0 ? 'None' : selectedVehicle.issues.join(', ')}</strong></span>
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <Target size={28} className="text-blue-400" />
-                Buyer Segment Matches
-              </h2>
-              
-              {buyerMatches.map((match, idx) => (
-                <div key={idx} className={`border rounded-lg p-5 ${
-                  match.score >= 80 
-                    ? 'bg-emerald-900/20 border-emerald-600/30' 
-                    : match.score >= 60 
-                    ? 'bg-blue-900/20 border-blue-600/30' 
-                    : 'bg-slate-800 border-slate-700'
-                }`}>
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-lg font-bold text-white">{match.profile}</h3>
-                      <p className="text-sm text-slate-400 mt-1">Budget: ₱{Math.floor(match.budgetMin/1000)}K - ₱{Math.floor(match.budgetMax/1000)}K</p>
+            {qualityData.flags.length > 0 && (
+              <div className="bg-red-950/30 border border-red-800/50 rounded-xl p-5 mb-6">
+                <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2 text-sm md:text-base">
+                  ⚠️ Risk Flags & Fraud Alerts
+                </h3>
+                <div className="space-y-2">
+                  {qualityData.flags.map((flag, idx) => (
+                    <div key={idx} className="bg-red-900/30 border border-red-700/40 p-3 rounded-lg flex justify-between items-center text-xs md:text-sm">
+                      <span className="font-semibold">{flag.message}</span>
+                      <span className="text-red-400 font-bold">-{flag.impact} pts</span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold text-blue-300">{match.score}%</div>
-                      <div className="text-sm text-slate-400">Match Score</div>
-                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'browse' && (
+          <div>
+            <div className="mb-4">
+              <h2 className="text-xl md:text-2xl font-bold mb-1">Marketplace Listings</h2>
+              <p className="text-slate-400 text-xs md:text-sm">Filter listings by risk status and keywords.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+              <input 
+                type="text" 
+                placeholder="Search by brand or model..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-xs md:text-sm text-white focus:outline-none focus:border-red-500"
+              />
+
+              <select 
+                value={riskFilter} 
+                onChange={(e) => setRiskFilter(e.target.value)}
+                className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-xs md:text-sm text-white focus:outline-none focus:border-red-500"
+              >
+                <option value="all">All Risk Levels</option>
+                <option value="high">🟢 Verified (90+ Score)</option>
+                <option value="medium">🟡 Caution (60-89 Score)</option>
+                <option value="low">🔴 High Risk (&lt;60 Score)</option>
+              </select>
+
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-xs md:text-sm text-white focus:outline-none focus:border-red-500"
+              >
+                <option value="score">Sort by Quality Score (High to Low)</option>
+                <option value="risk">Sort by Risk (Low Score First)</option>
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              {processedVehicles.map((v) => (
+                <div key={v.id} className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <h4 className="font-bold text-base md:text-lg text-white">{v.model}</h4>
+                    <p className="text-xs text-slate-400">Monthly: ₱{v.monthly.toLocaleString()} | Bank: {v.bank} | Status: {v.status}</p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-700">
-                    <div>
-                      <p className="text-xs text-slate-400 mb-1">Est. Buyers</p>
-                      <p className="text-2xl font-bold text-white">{match.estimatedBuyers}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400 mb-1">Status</p>
-                      <div className="flex gap-2">
-                        {match.budgetMatch && <span className="px-2 py-1 bg-emerald-600/30 text-emerald-300 text-xs rounded">Budget ✓</span>}
-                        {match.typeMatch && <span className="px-2 py-1 bg-blue-600/30 text-blue-300 text-xs rounded">Type ✓</span>}
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-4 self-end md:self-auto">
                     <div className="text-right">
-                      <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded font-semibold">
-                        Target →
-                      </button>
+                      <span className={`text-xl md:text-2xl font-black ${
+                        v.quality.score >= 90 ? 'text-emerald-400' :
+                        v.quality.score >= 60 ? 'text-amber-400' : 'text-red-400'
+                      }`}>{v.quality.score}</span>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">Trust Score</p>
                     </div>
+                    <button 
+                      onClick={() => { setSelectedVehicle(v); setActiveTab('detector'); }}
+                      className="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-semibold"
+                    >
+                      Inspect
+                    </button>
                   </div>
                 </div>
               ))}
@@ -223,83 +283,52 @@ const BuyerSellerMatcher = () => {
           </div>
         )}
 
-        {view === 'buyer' && (
-          <div className="space-y-8">
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-              <label className="block text-sm font-semibold text-white mb-4">
-                Your monthly budget? (₱)
-              </label>
-              <div className="space-y-4">
-                <input 
-                  type="range" 
-                  min={10000} 
-                  max={130000} 
-                  step={1000}
-                  value={buyerBudget}
-                  onChange={(e) => setBuyerBudget(parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-sm">₱10K</span>
-                  <span className="text-3xl font-bold text-blue-300">₱{buyerBudget.toLocaleString()}/mo</span>
-                  <span className="text-slate-400 text-sm">₱130K</span>
+        {activeTab === 'seller' && (
+          <div>
+            <div className="mb-4">
+              <h2 className="text-xl md:text-2xl font-bold mb-1">Seller Score Improvement Simulator</h2>
+              <p className="text-slate-400 text-xs md:text-sm">See how adding documents and photos directly boosts your listing score in real-time.</p>
+            </div>
+
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 md:p-6">
+              <h3 className="font-bold text-base md:text-lg mb-1">{selectedVehicle.model}</h3>
+              <p className="text-xs md:text-sm text-slate-400 mb-5">Current Trust Score: <strong className="text-red-400">{qualityData.score}/100</strong></p>
+
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700 gap-3">
+                  <div>
+                    <p className="font-semibold text-xs md:text-sm">Official Documents (OR/CR & ID)</p>
+                    <p className="text-[11px] text-slate-400">{selectedVehicle.documents ? 'Attached (+20 pts)' : 'Missing (-20 pts penalty)'}</p>
+                  </div>
+                  <button 
+                    onClick={() => toggleDocuments(selectedVehicle.id)}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold ${selectedVehicle.documents ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-red-600 hover:bg-red-500'}`}
+                  >
+                    {selectedVehicle.documents ? 'Attached (Click to Remove)' : 'Upload Documents (+20 pts)'}
+                  </button>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700 gap-3">
+                  <div>
+                    <p className="font-semibold text-xs md:text-sm">Vehicle Photo Gallery</p>
+                    <p className="text-[11px] text-slate-400">Currently: {selectedVehicle.photos} Photos uploaded</p>
+                  </div>
+                  <button 
+                    onClick={() => addPhotos(selectedVehicle.id)}
+                    className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-xs font-bold"
+                  >
+                    Add +2 Photos (+15 pts)
+                  </button>
                 </div>
               </div>
             </div>
-
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-white">
-                Perfect Matches for Your Budget ({vehiclesForBuyer.length} vehicles)
-              </h2>
-
-              {vehiclesForBuyer.length > 0 ? (
-                vehiclesForBuyer.map((vehicle) => (
-                  <div key={vehicle.id} className={`border rounded-lg p-5 ${
-                    vehicle.relevance === 'EXACT MATCH'
-                      ? 'bg-emerald-900/20 border-emerald-600/30'
-                      : vehicle.relevance === 'CLOSE MATCH'
-                      ? 'bg-blue-900/20 border-blue-600/30'
-                      : 'bg-slate-800 border-slate-700'
-                  }`}>
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-                      <div className="md:col-span-2">
-                        <h3 className="text-lg font-bold text-white">{vehicle.model}</h3>
-                        <p className="text-sm text-slate-400 mt-1">{vehicle.status}</p>
-                      </div>
-
-                      <div className="text-center">
-                        <p className="text-sm text-slate-400 mb-1">Monthly</p>
-                        <p className="text-2xl font-bold text-white">₱{vehicle.monthly.toLocaleString()}</p>
-                      </div>
-
-                      <div className="text-center">
-                        <p className="text-sm text-slate-400 mb-1">Match</p>
-                        <p className="text-3xl font-bold text-blue-300">{vehicle.matchScore}%</p>
-                      </div>
-
-                      <div className="text-center">
-                        <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg">
-                          View →
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 text-center">
-                  <p className="text-slate-400">No exact matches. Try adjusting ±₱5K</p>
-                </div>
-              )}
-            </div>
           </div>
         )}
+      </main>
 
-        <div className="text-center mt-12 text-slate-500 text-sm border-t border-slate-700 pt-8">
-          <p>AI Buyer-Seller Matcher v1.0 | Pasalo Cars PH</p>
-        </div>
-      </div>
+      <footer className="text-center text-slate-500 text-xs py-8 border-t border-slate-800">
+        Pasalo Cars PH Platform Engine © 2026 | Built for High-Trust Auto Marketplace
+      </footer>
     </div>
   );
-};
-
-export default BuyerSellerMatcher;
+}
