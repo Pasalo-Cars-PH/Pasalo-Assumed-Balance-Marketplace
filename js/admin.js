@@ -8,15 +8,17 @@ const money=n=>n==null?'—':'₱'+Number(n).toLocaleString('en-PH');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const statuses=['new','contacted','qualified','referred','negotiating','closed_won','closed_lost'];
 let leads=[];
-function showLogin(msg=''){ $('#login-view').classList.remove('hidden'); $('#dashboard-view').classList.add('hidden'); if(msg){$('#login-error').textContent=msg;$('#login-error').classList.remove('hidden')} }
-function showDashboard(){ $('#login-view').classList.add('hidden'); $('#dashboard-view').classList.remove('hidden'); }
+function hideAuthViews(){['login-view','reset-view'].forEach(id=>$('#'+id).classList.add('hidden'));}
+function showLogin(msg=''){hideAuthViews();$('#dashboard-view').classList.add('hidden');$('#login-view').classList.remove('hidden');if(msg){$('#login-error').textContent=msg;$('#login-error').classList.remove('hidden')}}
+function showReset(msg=''){hideAuthViews();$('#dashboard-view').classList.add('hidden');$('#reset-view').classList.remove('hidden');if(msg){$('#reset-error').textContent=msg;$('#reset-error').classList.remove('hidden')}}
+function showDashboard(){hideAuthViews();$('#dashboard-view').classList.remove('hidden');}
 function statusLabel(s){return s.replace('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
 function render(){
  const q=($('#search-leads').value||'').trim().toLowerCase(), f=$('#status-filter').value;
  const filtered=leads.filter(l=>{const hay=[l.buyer_name,l.buyer_mobile,l.unit_name,l.listing_owner_name].join(' ').toLowerCase();return(!q||hay.includes(q))&&(f==='all'||l.status===f)});
  $('#lead-body').innerHTML=filtered.map(l=>`<tr><td><div class="lead-name">${esc(l.buyer_name)}</div><div class="lead-sub">${esc(l.buyer_mobile)} · ${esc(l.preferred_contact||'Contact not specified')}</div></td><td><div class="lead-name">${esc(l.unit_name||'Unit not specified')}</div><div class="lead-sub">${esc(l.unit_id||'')}</div></td><td><div>${money(l.monthly_budget)}/mo</div><div class="lead-sub">Cash-out: ${money(l.cashout_budget)}</div></td><td>${esc(l.buyer_location||'—')}</td><td><div>${esc(l.listing_owner_name||'Pasalo Cars PH')}</div><div class="lead-sub">${esc(l.listing_owner_mobile||'')}</div></td><td>${new Date(l.created_at).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})}</td><td><select class="status-select" data-id="${l.id}">${statuses.map(s=>`<option value="${s}" ${s===l.status?'selected':''}>${statusLabel(s)}</option>`).join('')}</select></td></tr>`).join('');
  $('#empty-leads').classList.toggle('hidden',filtered.length>0);
- $('#stat-total').textContent=leads.length; $('#stat-new').textContent=leads.filter(x=>x.status==='new').length; $('#stat-contacted').textContent=leads.filter(x=>x.status==='contacted').length; $('#stat-won').textContent=leads.filter(x=>x.status==='closed_won').length;
+ $('#stat-total').textContent=leads.length;$('#stat-new').textContent=leads.filter(x=>x.status==='new').length;$('#stat-contacted').textContent=leads.filter(x=>x.status==='contacted').length;$('#stat-won').textContent=leads.filter(x=>x.status==='closed_won').length;
  document.querySelectorAll('.status-select').forEach(el=>el.addEventListener('change',()=>updateStatus(el.dataset.id,el.value)));
 }
 async function loadLeads(){
@@ -30,8 +32,27 @@ async function updateStatus(id,status){
  if(error){$('#dashboard-error').textContent='Status update failed: '+error.message;$('#dashboard-error').classList.remove('hidden');return}
  const lead=leads.find(x=>x.id===id);if(lead)lead.status=status;render();
 }
-$('#login-form').addEventListener('submit',async e=>{e.preventDefault();$('#login-error').classList.add('hidden');const email=$('#login-email').value.trim().toLowerCase(),password=$('#login-password').value;if(email!==ADMIN_EMAIL){showLogin('This admin dashboard is restricted to the authorized admin email.');return}const {error}=await supabase.auth.signInWithPassword({email,password});if(error){$('#login-error').textContent=error.message;$('#login-error').classList.remove('hidden');return}showDashboard();await loadLeads();});
+async function sendRecovery(){
+ const email=$('#login-email').value.trim().toLowerCase();
+ if(email!==ADMIN_EMAIL){showLogin('Use the authorized Pasalo Cars PH admin email.');return}
+ $('#login-error').classList.add('hidden');
+ const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:new URL('admin.html',window.location.href).href});
+ if(error){showLogin('Password recovery could not be sent right now. If you see a rate-limit message, wait before trying again.');return}
+ showLogin('Recovery email sent. Open the latest email and use the link to set a new password.');
+}
+async function sendMagicLink(){
+ const email=$('#login-email').value.trim().toLowerCase();
+ if(email!==ADMIN_EMAIL){showLogin('Use the authorized Pasalo Cars PH admin email.');return}
+ $('#login-error').classList.add('hidden');
+ const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:new URL('admin.html',window.location.href).href,shouldCreateUser:false}});
+ if(error){showLogin('Sign-in link could not be sent right now. If Supabase is rate-limiting emails, wait before trying again.');return}
+ showLogin('Sign-in link sent. Open the latest email on this device to enter the Lead Dashboard.');
+}
+$('#login-form').addEventListener('submit',async e=>{e.preventDefault();$('#login-error').classList.add('hidden');const email=$('#login-email').value.trim().toLowerCase(),password=$('#login-password').value;if(email!==ADMIN_EMAIL){showLogin('This admin dashboard is restricted to the authorized admin email.');return}if(!password){showLogin('Enter your password, or use Forgot password? to reset it.');return}const {error}=await supabase.auth.signInWithPassword({email,password});if(error){const message=/invalid login credentials/i.test(error.message)?'Email or password is incorrect. Use Forgot password? if you no longer know the password.':error.message;showLogin(message);return}showDashboard();await loadLeads();});
+$('#forgot-password-btn').addEventListener('click',sendRecovery);
+$('#magic-link-btn').addEventListener('click',sendMagicLink);
+$('#reset-form').addEventListener('submit',async e=>{e.preventDefault();$('#reset-error').classList.add('hidden');const p=$('#new-password').value,c=$('#confirm-password').value;if(p.length<8){showReset('Use a password with at least 8 characters.');return}if(p!==c){showReset('Passwords do not match.');return}const {error}=await supabase.auth.updateUser({password:p});if(error){showReset(error.message);return}await supabase.auth.signOut();showLogin('Password updated successfully. You can now sign in normally with your new password.');});
 $('#logout-btn').addEventListener('click',async()=>{await supabase.auth.signOut();showLogin()});
 $('#refresh-btn').addEventListener('click',loadLeads);$('#search-leads').addEventListener('input',render);$('#status-filter').addEventListener('change',render);
-(async()=>{const {data:{session}}=await supabase.auth.getSession();if(session?.user?.email?.toLowerCase()===ADMIN_EMAIL){showDashboard();await loadLeads()}else{if(session)await supabase.auth.signOut();showLogin()}})();
-supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin()});
+(async()=>{const {data:{session}}=await supabase.auth.getSession();if(session?.user?.email?.toLowerCase()===ADMIN_EMAIL){if(window.location.hash.includes('type=recovery'))showReset();else{showDashboard();await loadLeads()}}else{if(session)await supabase.auth.signOut();showLogin()}})();
+supabase.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'){showReset();return}if(event==='SIGNED_IN'&&session?.user?.email?.toLowerCase()===ADMIN_EMAIL&&!window.location.hash.includes('type=recovery')){showDashboard();await loadLeads()}if(event==='SIGNED_OUT')showLogin()});
