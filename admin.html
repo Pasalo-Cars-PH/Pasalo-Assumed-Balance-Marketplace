@@ -24,7 +24,7 @@
 <div class="form-group"><label>Email</label><input id="login-email" type="email" autocomplete="email" value="derlonskie0929@gmail.com" required></div>
 <div class="form-group"><label>Password</label><input id="login-password" type="password" autocomplete="current-password" required></div>
 <button class="btn btn-primary" type="submit">Sign in</button>
-<div class="auth-actions"><button id="forgot-password-btn" class="btn btn-secondary" type="button">Forgot password?</button><button id="magic-link-btn" class="btn btn-secondary" type="button">Email me a sign-in link</button></div>
+<div class="auth-actions"><button id="forgot-password-btn" class="btn btn-secondary" type="button" onclick="sendRecovery();return false;">Forgot password?</button><button id="magic-link-btn" class="btn btn-secondary" type="button" onclick="sendMagicLink();return false;">Email me a sign-in link</button></div>
 <p class="auth-help">Password recovery and sign-in links are sent only to the authorized admin email. If Supabase temporarily rate-limits emails, wait before requesting another message.</p>
 <div id="login-error" class="notice hidden"></div>
 </form>
@@ -43,15 +43,10 @@
 <section id="dashboard-view" class="hidden">
 <div class="admin-head"><div><span class="eyebrow">PASALO CARS PH CRM</span><h1>Buyer Leads</h1><p class="vehicle-meta">Every marketplace inquiry comes here first.</p></div><div class="admin-actions"><button id="refresh-btn" class="btn btn-secondary">Refresh</button><button id="logout-btn" class="btn btn-secondary">Log out</button></div></div>
 <div class="lead-stats"><div class="admin-card stat"><small>Total leads</small><b id="stat-total">0</b></div><div class="admin-card stat"><small>New</small><b id="stat-new">0</b></div><div class="admin-card stat"><small>Contacted</small><b id="stat-contacted">0</b></div><div class="admin-card stat"><small>Closed won</small><b id="stat-won">0</b></div></div>
-<div class="admin-card">
-<div class="toolbar"><input id="search-leads" placeholder="Search buyer, mobile, or unit"><select id="status-filter"><option value="all">All statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="qualified">Qualified</option><option value="referred">Referred</option><option value="negotiating">Negotiating</option><option value="closed_won">Closed won</option><option value="closed_lost">Closed lost</option></select></div>
-<div id="dashboard-error" class="notice hidden"></div>
-<div class="lead-table-wrap"><table class="lead-table"><thead><tr><th>Buyer</th><th>Unit</th><th>Budget</th><th>Location</th><th>Owner / Agent</th><th>Date</th><th>Status</th></tr></thead><tbody id="lead-body"></tbody></table></div>
-<div id="empty-leads" class="empty-state hidden">No leads match your filter.</div>
-</div>
+<div class="admin-card"><div class="toolbar"><input id="search-leads" placeholder="Search buyer, mobile, or unit"><select id="status-filter"><option value="all">All statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="qualified">Qualified</option><option value="referred">Referred</option><option value="negotiating">Negotiating</option><option value="closed_won">Closed won</option><option value="closed_lost">Closed lost</option></select></div><div id="dashboard-error" class="notice hidden"></div><div class="lead-table-wrap"><table class="lead-table"><thead><tr><th>Buyer</th><th>Unit</th><th>Budget</th><th>Location</th><th>Owner / Agent</th><th>Date</th><th>Status</th></tr></thead><tbody id="lead-body"></tbody></table></div><div id="empty-leads" class="empty-state hidden">No leads match your filter.</div></div>
 </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/admin.js"></script>
+<script src="js/admin.js?v=20260813-2"></script>
 </body>
 </html>
