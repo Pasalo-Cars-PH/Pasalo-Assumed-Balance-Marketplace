@@ -57,6 +57,35 @@
       "color": "White",
       "notes": "Approval sale; brand new; today release; Toyota Calamba casa; cash-out ₱420,000; monthly ₱37K+.",
       "image": "images/PCPH-000017.jpg"
+    },
+    {
+      "id": "PCPH-000018",
+      "status": "active",
+      "verified": false,
+      "featured": true,
+      "make": "Toyota",
+      "model": "Fortuner",
+      "year": 2025,
+      "variant": "V 2.4 V 4x2 A/T",
+      "bodyType": "SUV",
+      "transmission": "Automatic",
+      "fuelType": "Diesel",
+      "location": "Manila",
+      "monthly": 40491,
+      "cashOut": 350000,
+      "bank": "PSBank",
+      "monthsPaid": 8,
+      "monthsRemaining": 52,
+      "mileage": "6,500 km",
+      "nextDue": "2026-09-17",
+      "term": "5 years",
+      "sellerType": "owner",
+      "listedAt": "2026-08-14T17:42:00+08:00",
+      "updatedAt": "2026-08-14T17:42:00+08:00",
+      "emoji": "🚙",
+      "color": "Dark Gray",
+      "notes": "Push start button; no issue; 8 months paid; 52 months left; next due September 17, 2026; cash-out ₱350,000.",
+      "image": "images/PCPH-000018.jpg"
     }
   ]
 }
