@@ -1,0 +1,33 @@
+{
+  "vehicles": [
+    {
+      "id": "PCPH-000016",
+      "status": "active",
+      "verified": false,
+      "featured": true,
+      "make": "Toyota",
+      "model": "Wigo",
+      "year": 2026,
+      "variant": "G CVT AT",
+      "bodyType": "Hatchback",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "location": "Marilao",
+      "monthly": 15166,
+      "cashOut": null,
+      "bank": "Toyota Financial Services (TFS)",
+      "monthsPaid": 5,
+      "monthsRemaining": 55,
+      "mileage": "3,500 km",
+      "nextDue": "2026-09-17",
+      "term": "5 years",
+      "sellerType": "owner",
+      "listedAt": "2026-08-14T00:00:00+08:00",
+      "updatedAt": "2026-08-14T00:00:00+08:00",
+      "emoji": "🚗",
+      "color": "Gray Metallic",
+      "notes": "5 months paid; 55 months remaining; next due September 17, 2026; cash-out PM.",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Toyota_Wigo_A350LA_1.0_G_Gray_Metallic.jpg"
+    }
+  ]
+}
