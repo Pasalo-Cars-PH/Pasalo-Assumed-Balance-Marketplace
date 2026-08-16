@@ -260,6 +260,35 @@
       "color": "Precious White Pearl",
       "notes": "Assume Balance; on hand and ready for viewing; ₱300K+ worth of upgrades and accessories including BF Goodrich all-terrain tires and upgraded mags, full ceramic Phantom tint, and full 5D deep dish matting.",
       "image": "images/PCPH-000024.webp"
+    },
+    {
+      "id": "PCPH-000025",
+      "status": "active",
+      "verified": false,
+      "featured": true,
+      "make": "Toyota",
+      "model": "Innova",
+      "year": 2026,
+      "variant": "XE CVT",
+      "bodyType": "MPV",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "location": "Sta. Rosa Toyota",
+      "monthly": 29147,
+      "cashOut": 235000,
+      "bank": "Toyota Financial Services (TFS)",
+      "monthsPaid": 0,
+      "monthsRemaining": 60,
+      "mileage": "Brand New",
+      "nextDue": null,
+      "term": "5 years",
+      "sellerType": "dealer",
+      "listedAt": "2026-08-16T00:00:00+08:00",
+      "updatedAt": "2026-08-16T00:00:00+08:00",
+      "emoji": "🚐",
+      "color": "Any Color Available",
+      "notes": "Approval for sale; brand new; SRP ₱1,381,000; cash-out ₱235,000; ₱29,147 monthly amortization; 5 years term; under TFS; any color available.",
+      "image": "images/PCPH-000024.webp"
     }
   ]
 }
