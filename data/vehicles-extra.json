@@ -14,7 +14,7 @@
       "fuelType": "Gasoline",
       "location": "Marilao",
       "monthly": 15166,
-      "cashOut": null,
+      "cashOut": 140000,
       "bank": "Toyota Financial Services (TFS)",
       "monthsPaid": 5,
       "monthsRemaining": 55,
