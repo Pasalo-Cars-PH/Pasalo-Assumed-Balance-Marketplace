@@ -7,7 +7,7 @@ const img=v=>{const src=imageUrl(v);if(!src)return `<span class="image-fallback"
 let vehicles=[];
 const SUPABASE_URL='https://jpktdmpcodwdmaucvmgd.supabase.co';
 const SUPABASE_KEY='sb_publishable_wvefX4h41g-0X2XX8Lp-pg_t2R9Qmwn';
-const DATA_VERSION='20260817-2';
+const DATA_VERSION='20260818-1';
 
 async function fetchJson(path){
   const url=new URL(path,document.baseURI);
@@ -22,9 +22,10 @@ async function fetchJson(path){
 }
 
 async function loadVehicles(){
-  const results=await Promise.allSettled([fetchJson('data/vehicles.json'),fetchJson('data/vehicles-extra.json')]);
+  const sources=['data/vehicles.json','data/vehicles-extra.json','data/vehicles-new.json'];
+  const results=await Promise.allSettled(sources.map(fetchJson));
   const errors=[];
-  results.forEach((r,i)=>{if(r.status==='rejected')errors.push(`${i===0?'vehicles.json':'vehicles-extra.json'}: ${r.reason?.message||r.reason}`)});
+  results.forEach((r,i)=>{if(r.status==='rejected')errors.push(`${sources[i]}: ${r.reason?.message||r.reason}`)});
   const loaded=results.filter(r=>r.status==='fulfilled').map(r=>r.value?.vehicles||[]).flat();
   const byId=new Map(loaded.map(v=>[v.id,v]));
   vehicles=[...byId.values()];
