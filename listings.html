@@ -1,1 +1,94 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Browse Vehicles | Pasalo Cars PH</title><meta name="description" content="Browse Pasalo and Assumed-Balance vehicles by monthly payment, cash-out, location and body type."><link rel="stylesheet" href="css/style.css?v=20260817-2"></head><body><header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">P</span><span>PASALO CARS <b>PH</b></span></a><nav><a href="listings.html">Buy a Car</a><a href="list-your-car.html">Sell / Pasalo</a><a href="find-my-car.html">Find My Car</a><a href="how-it-works.html">How It Works</a></nav><a class="btn btn-primary header-cta" href="list-your-car.html">List Your Car</a></header><section class="page-hero"><span class="eyebrow">MARKETPLACE</span><h1>Find your next Pasalo deal.</h1><p>Search by vehicle, monthly payment, cash-out and location.</p></section><main class="marketplace"><aside class="filters"><h3>Filters</h3><label>Search</label><input id="q" data-filter="q" placeholder="Make or model"><label>Location</label><select id="location"><option value="">Any location</option><option>Cavite</option><option>Laguna</option><option>Metro Manila</option><option>Batangas</option><option>Cebu</option></select><label>Body Type</label><select id="body"><option value="">Any type</option><option>SUV</option><option>Sedan</option><option>MPV</option><option>Pickup</option><option>Hybrid</option></select><label>Maximum monthly</label><input id="monthly" type="number" min="0" placeholder="₱25,000"><label>Maximum cash-out</label><input id="cash" type="number" min="0" placeholder="₱300,000"><button id="apply" type="button" class="btn btn-primary" style="width:100%;margin-top:18px">Apply Filters</button></aside><section><div class="results-head"><div><b id="result-count">Loading...</b><div class="vehicle-meta">Fresh listings updated regularly</div></div><select id="sort" aria-label="Sort vehicles"><option value="new">Newest</option><option value="monthly">Lowest monthly</option><option value="cash">Lowest cash-out</option></select></div><div id="results-grid" class="results-grid"></div></section></main><script src="js/app.js?v=20260817-2"></script><script src="js/data-recovery.js?v=20260817-3"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071a33">
+  <meta name="description" content="Browse Pasalo Cars PH assumed-balance and approval-for-sale vehicles by brand, monthly payment, cash-out and location.">
+  <meta property="og:title" content="Browse Vehicles | Pasalo Cars PH">
+  <meta property="og:description" content="Find your next Pasalo or Assume Balance vehicle. Compare cash-out, monthly payment and location.">
+  <meta property="og:type" content="website">
+  <title>Browse Vehicles | Pasalo Cars PH</title>
+  <link rel="stylesheet" href="css/style.css?v=20260819-1">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="Pasalo Cars PH home">
+    <span class="brand-mark">P</span>
+    <span class="brand-copy"><strong>PASALO CARS</strong> <b>PH</b><small>ASSUMED BALANCE MARKETPLACE</small></span>
+  </a>
+  <nav aria-label="Main navigation">
+    <a href="listings.html" class="active">Buy a Car</a>
+    <a href="list-your-car.html">Sell / Pasalo</a>
+    <a href="find-my-car.html">Find My Car</a>
+    <a href="how-it-works.html">How It Works</a>
+  </nav>
+  <a class="btn btn-primary header-cta" href="list-your-car.html">List Your Car</a>
+</header>
+
+<section class="page-hero marketplace-hero">
+  <div>
+    <span class="eyebrow">PASALO CARS PH • MARKETPLACE</span>
+    <h1>Find a deal that fits your budget.</h1>
+    <p>Compare cash-out, monthly amortization, vehicle type and location — all in one place.</p>
+  </div>
+  <div class="hero-trust"><span>🚗</span><div><b>Live marketplace catalog</b><small>Listings are loaded from the latest vehicle data.</small></div></div>
+</section>
+
+<main class="marketplace">
+  <aside class="filters" aria-label="Vehicle filters">
+    <div class="filter-heading"><div><span class="eyebrow">FILTER</span><h3>Find your car</h3></div><button id="clear-filters" class="text-button" type="button">Clear</button></div>
+    <label for="q">Search</label>
+    <input id="q" data-filter="q" autocomplete="off" placeholder="Toyota, Fortuner, Innova...">
+
+    <label for="make">Brand</label>
+    <select id="make"><option value="">Any brand</option></select>
+
+    <label for="location">Location</label>
+    <select id="location"><option value="">Any location</option></select>
+
+    <label for="body">Vehicle type</label>
+    <select id="body"><option value="">Any type</option></select>
+
+    <div class="filter-grid-2">
+      <div><label for="monthly">Max monthly</label><input id="monthly" type="number" min="0" step="500" inputmode="numeric" placeholder="₱40,000"></div>
+      <div><label for="cash">Max cash-out</label><input id="cash" type="number" min="0" step="5000" inputmode="numeric" placeholder="₱300,000"></div>
+    </div>
+    <div class="filter-grid-2">
+      <div><label for="min-monthly">Min monthly</label><input id="min-monthly" type="number" min="0" step="500" inputmode="numeric" placeholder="₱10,000"></div>
+      <div><label for="min-cash">Min cash-out</label><input id="min-cash" type="number" min="0" step="5000" inputmode="numeric" placeholder="₱100,000"></div>
+    </div>
+    <button id="apply" type="button" class="btn btn-primary filter-submit">Apply Filters</button>
+  </aside>
+
+  <section aria-live="polite">
+    <div class="results-head">
+      <div><b id="result-count">Loading marketplace...</b><div id="result-summary" class="vehicle-meta">Preparing latest listings</div></div>
+      <select id="sort" aria-label="Sort vehicles">
+        <option value="new">Newest first</option>
+        <option value="monthly">Lowest monthly</option>
+        <option value="cash">Lowest cash-out</option>
+        <option value="year">Newest model year</option>
+      </select>
+    </div>
+    <div id="active-filters" class="active-filters"></div>
+    <div id="results-grid" class="results-grid"></div>
+    <div id="load-more-wrap" class="load-more-wrap hidden"><button id="load-more" type="button" class="btn btn-secondary">Load more vehicles</button><small id="load-more-count"></small></div>
+  </section>
+</main>
+
+<section class="section tinted marketplace-note">
+  <div class="section-head"><div><span class="eyebrow">SHOP WITH CLARITY</span><h2>Important before you reserve</h2></div></div>
+  <div class="info-grid">
+    <div><b>01 • Confirm the figures</b><p>Monthly payment, cash-out, remaining term and next due date should be confirmed before any payment.</p></div>
+    <div><b>02 • Check the unit</b><p>Ask for current photos, documents and actual vehicle location before finalizing a deal.</p></div>
+    <div><b>03 • Use the details page</b><p>Open any listing to see the available vehicle information and send an inquiry.</p></div>
+  </div>
+</section>
+
+<footer><div><b>PASALO CARS PH</b><p>Assumed Balance Marketplace for buyers and sellers in the Philippines.</p></div><div><a href="listings.html">Buy</a><a href="list-your-car.html">Sell / Pasalo</a><a href="how-it-works.html">How It Works</a></div><small>© 2026 Pasalo Cars PH. Listing information should be verified with the seller before any transaction.</small></footer>
+
+<script src="js/app.js?v=20260819-1"></script>
+<script src="js/data-recovery.js?v=20260819-1"></script>
+</body>
+</html>
