@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pasalo-cars-ph.github.io/Pasalo-Assumed-Balance-Marketplace/sitemap.xml
