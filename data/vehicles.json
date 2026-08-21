@@ -784,6 +784,35 @@
       "color": "Black",
       "notes": "Assume Balance car; ready to deal; 2 months paid; 58 months remaining; next due September 8, 2026; 4K+ km mileage; no issue; cash-out ₱300,000.",
       "image": "images/PCPH-000027.webp"
+    },
+    {
+      "id": "PCPH-000028",
+      "status": "active",
+      "verified": false,
+      "featured": true,
+      "make": "Ford",
+      "model": "Ranger",
+      "year": 2024,
+      "variant": "Wildtrak",
+      "bodyType": "Pickup",
+      "transmission": "Automatic",
+      "fuelType": "Diesel",
+      "location": "La Union",
+      "monthly": 33322,
+      "cashOut": 300000,
+      "bank": "To confirm",
+      "monthsPaid": 23,
+      "monthsRemaining": 37,
+      "mileage": "21000 km",
+      "nextDue": "September 2",
+      "term": "5 years",
+      "sellerType": "owner",
+      "listedAt": "2026-08-21T12:00:00+08:00",
+      "updatedAt": "2026-08-21T12:00:00+08:00",
+      "emoji": "🛻",
+      "color": "Arctic White",
+      "notes": "Assume balance; coding Friday; can deliver from La Union",
+      "image": "images/PCPH-000028.webp"
     }
   ]
 }
