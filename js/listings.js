@@ -47,6 +47,19 @@
     return new URL(String(path).replace(/^\.\//, ''), document.baseURI).href;
   }
 
+  function normalizeVehicle(v) {
+    if (!v || typeof v !== 'object') return v;
+    // Keep old/new listing schemas compatible. This also repairs legacy field names.
+    if (v.monthly == null && v.monthly_payment != null) v.monthly = v.monthly_payment;
+    if (v.cashOut == null && v.cash_out != null) v.cashOut = v.cash_out;
+    if (v.monthsRemaining == null && v.remaining_months != null) v.monthsRemaining = v.remaining_months;
+    if (v.mileage == null && v.odometer != null) v.mileage = String(v.odometer) + (v.odometer_unit ? ' ' + v.odometer_unit : '');
+    if (v.bank == null && v.financing != null) v.bank = v.financing;
+    if (!v.bodyType) v.bodyType = 'Vehicle';
+    if (!v.status) v.status = 'active';
+    return v;
+  }
+
   function listingCard(v) {
     var t = vehicleTitle(v);
     var img = imageUrl(v.image);
@@ -141,7 +154,14 @@
     try {
       var response = await fetch(url, {cache:'no-store', headers:{Accept:'application/json'}, signal:controller.signal});
       if (!response.ok) throw new Error('HTTP ' + response.status);
-      return await response.json();
+      var text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch (parseError) {
+        // Repair a known malformed legacy tail without modifying the source inventory.
+        var repaired = text.replace(/("cash_out"\s*:\s*-?\d+(?:\.\d+)?)"(\s*,?\s*\n\s*"listedAt")/g, '$1,$2');
+        return JSON.parse(repaired);
+      }
     } finally { clearTimeout(timer); }
   }
 
@@ -156,7 +176,7 @@
     for(var i=0;i<sources.length;i++){
       try{
         var data=await fetchJson(sources[i],10000);
-        var list=Array.isArray(data.vehicles)?data.vehicles:[];
+        var list=Array.isArray(data.vehicles)?data.vehicles.map(normalizeVehicle):[];
         if(!list.length) throw new Error('Vehicle data is empty');
         allVehicles=list;
         window.vehicles=allVehicles;
