@@ -1,31 +1,28 @@
-/* ============================================================================
-   PASALO CARS PH - LISTINGS / MARKETPLACE PAGE
-   Compatible with v1-marketplace branch
-   ============================================================================ */
-
+/* PASALO CARS PH — MARKETPLACE LISTINGS */
 (function () {
   'use strict';
 
-  // ---------- Helpers ----------
+  var allVehicles = [];
+  var filteredVehicles = [];
+
   function money(n, fallback) {
     fallback = fallback || 'PM for details';
     if (n == null || n === '' || Number.isNaN(Number(n))) return fallback;
     return '₱' + Number(n).toLocaleString('en-PH');
   }
 
-  function show(v) {
-    return v == null || v === '' ? 'To confirm' : String(v);
-  }
+  function show(v) { return v == null || v === '' ? 'To confirm' : String(v); }
 
   function vehicleTitle(v) {
-    return [v.make, v.model, v.variant && v.variant !== '—' ? v.variant : '', v.year && v.year !== '—' ? v.year : '']
-      .filter(Boolean)
-      .join(' ');
+    return [v.year, v.make, v.model, v.variant && v.variant !== '—' ? v.variant : '']
+      .filter(Boolean).join(' ');
   }
 
   function ageLabel(v) {
     if (!v.listedAt) return 'Listed recently';
-    var h = Math.max(0, (Date.now() - new Date(v.listedAt).getTime()) / 36e5);
+    var time = new Date(v.listedAt).getTime();
+    if (!Number.isFinite(time)) return 'Listed recently';
+    var h = Math.max(0, (Date.now() - time) / 36e5);
     if (h < 1) return 'Listed ' + Math.max(1, Math.round(h * 60)) + ' min ago';
     if (h < 24) return 'Listed ' + Math.round(h) + ' hr ago';
     var d = Math.round(h / 24);
@@ -33,228 +30,154 @@
   }
 
   function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   function toNumber(val) {
     if (val == null || val === '') return null;
-    var n = Number(String(val).replace(/,/g, ''));
+    var n = Number(String(val).replace(/[^0-9.-]/g, ''));
     return Number.isNaN(n) ? null : n;
   }
 
-  // ---------- Shared state ----------
-  var allVehicles = [];
-  var filteredVehicles = [];
+  function imageUrl(path) {
+    if (!path) return '';
+    if (/^https?:\/\//i.test(path)) return path;
+    return new URL(String(path).replace(/^\.\//, ''), document.baseURI).href;
+  }
 
-  // ---------- Card template ----------
   function listingCard(v) {
     var t = vehicleTitle(v);
-    var img = v.image
-      ? '<img src="' + escapeHtml(v.image) + '" alt="' + escapeHtml(t) + '" loading="lazy" onerror="this.style.display=\'none\'">'
+    var img = imageUrl(v.image);
+    var image = img
+      ? '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(t) + '" loading="lazy" decoding="async" onerror="this.closest(\'.vehicle-image\').classList.add(\'image-failed\');this.remove()">'
       : '';
     var emoji = escapeHtml(v.emoji || '🚗');
+    var cash = toNumber(v.cashOut);
+    var inquiry = 'https://m.me/PasaloCarsPH21?ref=' + encodeURIComponent('Marketplace inquiry: ' + t);
 
-    return (
-      '<article class="vehicle-card">' +
-      '<div class="vehicle-image">' +
-      (img || '<div style="display:grid;place-items:center;font-size:48px;height:100%;background:#edf0f4">' + emoji + '</div>') +
+    return '<article class="vehicle-card">' +
+      '<div class="vehicle-image">' + (image || '<div class="vehicle-image-fallback">' + emoji + '</div>') +
       (v.color ? '<div class="vehicle-badges"><span class="badge">' + escapeHtml(v.color) + '</span></div>' : '') +
       '</div>' +
       '<div class="vehicle-body">' +
       '<div class="vehicle-title">' + escapeHtml(t) + '</div>' +
-      '<div class="vehicle-price">' + money(v.cashOut) + ' cash-out</div>' +
+      '<div class="vehicle-price">' + (cash != null ? money(cash) : 'PM') + ' cash-out</div>' +
       '<div class="vehicle-monthly">' + money(v.monthly) + (v.monthly != null ? ' / month' : '') + '</div>' +
-      '<div class="vehicle-meta">' +
-      '<span>📍 ' + escapeHtml(show(v.location)) + '</span>' +
-      '<span>🏦 ' + escapeHtml(show(v.bank)) + '</span>' +
-      '<span>' + escapeHtml(ageLabel(v)) + '</span>' +
-      '</div>' +
-      '<a class="btn btn-secondary" href="vehicle.html?id=' + encodeURIComponent(v.id) + '">View Details</a>' +
-      '</div>' +
-      '</article>'
-    );
+      '<div class="vehicle-meta"><span>📍 ' + escapeHtml(show(v.location)) + '</span><span>🏦 ' + escapeHtml(show(v.bank)) + '</span><span>' + escapeHtml(ageLabel(v)) + '</span></div>' +
+      '<div class="vehicle-actions"><a class="btn btn-secondary" href="vehicle.html?id=' + encodeURIComponent(v.id) + '">View Details</a><a class="btn btn-primary" target="_blank" rel="noopener" href="' + escapeHtml(inquiry) + '">💬 Inquire</a></div>' +
+      '</div></article>';
   }
 
-  // ---------- Populate filter dropdowns ----------
   function populateFilters() {
-    var makes = new Set();
-    var locations = new Set();
-    var bodies = new Set();
-
+    var makes = new Set(), locations = new Set(), bodies = new Set();
     allVehicles.forEach(function (v) {
       if (v.make) makes.add(v.make);
       if (v.location && v.location !== 'To confirm') locations.add(v.location);
       if (v.bodyType) bodies.add(v.bodyType);
     });
-
-    function fillSelect(id, values) {
-      var el = document.getElementById(id);
-      if (!el) return;
+    function fill(id, values, label) {
+      var el = document.getElementById(id); if (!el) return;
       var current = el.value;
-      el.innerHTML = '<option value="">Any</option>';
-      Array.from(values).sort().forEach(function (val) {
-        var opt = document.createElement('option');
-        opt.value = val;
-        opt.textContent = val;
-        el.appendChild(opt);
+      el.innerHTML = '<option value="">' + label + '</option>';
+      Array.from(values).sort().forEach(function (value) {
+        var option = document.createElement('option'); option.value = value; option.textContent = value; el.appendChild(option);
       });
       if (current) el.value = current;
     }
-
-    fillSelect('make', makes);
-    fillSelect('location', locations);
-    fillSelect('body', bodies);
+    fill('make', makes, 'Any brand'); fill('location', locations, 'Any location'); fill('body', bodies, 'Any type');
   }
 
-  // ---------- Filter + Sort ----------
   function applyFilters() {
     var q = (document.getElementById('q')?.value || '').trim().toLowerCase();
     var make = document.getElementById('make')?.value || '';
     var loc = document.getElementById('location')?.value || '';
     var body = document.getElementById('body')?.value || '';
-    var maxMonthly = toNumber(document.getElementById('monthly')?.value) ?? Infinity;
-    var maxCash = toNumber(document.getElementById('cash')?.value) ?? Infinity;
-    var minMonthly = toNumber(document.getElementById('min-monthly')?.value) ?? 0;
-    var minCash = toNumber(document.getElementById('min-cash')?.value) ?? 0;
+    var maxMonthly = toNumber(document.getElementById('monthly')?.value); var maxCash = toNumber(document.getElementById('cash')?.value);
+    var minMonthly = toNumber(document.getElementById('min-monthly')?.value); var minCash = toNumber(document.getElementById('min-cash')?.value);
     var sort = document.getElementById('sort')?.value || 'new';
 
     filteredVehicles = allVehicles.filter(function (v) {
       if (v.status !== 'active') return false;
-
-      var title = (v.make + ' ' + v.model + ' ' + (v.variant || '') + ' ' + (v.color || '')).toLowerCase();
+      var title = [v.year, v.make, v.model, v.variant, v.color, v.location].join(' ').toLowerCase();
       if (q && !title.includes(q)) return false;
       if (make && v.make !== make) return false;
       if (loc && v.location !== loc) return false;
       if (body && v.bodyType !== body) return false;
-
-      var monthly = toNumber(v.monthly);
-      var cash = toNumber(v.cashOut);
-
-      if (monthly != null) {
-        if (monthly > maxMonthly) return false;
-        if (monthly < minMonthly) return false;
-      }
-      if (cash != null) {
-        if (cash > maxCash) return false;
-        if (cash < minCash) return false;
-      }
-
+      var monthly = toNumber(v.monthly), cash = toNumber(v.cashOut);
+      if (monthly != null && maxMonthly != null && monthly > maxMonthly) return false;
+      if (monthly != null && minMonthly != null && monthly < minMonthly) return false;
+      if (cash != null && maxCash != null && cash > maxCash) return false;
+      if (cash != null && minCash != null && cash < minCash) return false;
       return true;
     });
 
-    // Sort
-    if (sort === 'monthly') {
-      filteredVehicles.sort(function (a, b) {
-        return (toNumber(a.monthly) ?? Infinity) - (toNumber(b.monthly) ?? Infinity);
-      });
-    } else if (sort === 'cash') {
-      filteredVehicles.sort(function (a, b) {
-        return (toNumber(a.cashOut) ?? Infinity) - (toNumber(b.cashOut) ?? Infinity);
-      });
-    } else if (sort === 'year') {
-      filteredVehicles.sort(function (a, b) {
-        return (b.year || 0) - (a.year || 0);
-      });
-    } else {
-      // newest first
-      filteredVehicles.sort(function (a, b) {
-        return new Date(b.listedAt || 0) - new Date(a.listedAt || 0);
-      });
-    }
+    if (sort === 'monthly') filteredVehicles.sort(function(a,b){return (toNumber(a.monthly) ?? Infinity)-(toNumber(b.monthly) ?? Infinity);});
+    else if (sort === 'cash') filteredVehicles.sort(function(a,b){return (toNumber(a.cashOut) ?? Infinity)-(toNumber(b.cashOut) ?? Infinity);});
+    else if (sort === 'year') filteredVehicles.sort(function(a,b){return (b.year || 0)-(a.year || 0);});
+    else filteredVehicles.sort(function(a,b){return new Date(b.listedAt || 0)-new Date(a.listedAt || 0);});
 
     renderResults();
   }
 
-  // ---------- Render results ----------
   function renderResults() {
-    var grid = document.getElementById('results-grid');
-    var countEl = document.getElementById('result-count');
-    var summaryEl = document.getElementById('result-summary');
-
-    if (!grid) return;
-
-    if (countEl) {
-      countEl.textContent = filteredVehicles.length + ' vehicle' + (filteredVehicles.length === 1 ? '' : 's') + ' found';
-    }
-    if (summaryEl) {
-      summaryEl.textContent = filteredVehicles.length ? 'Showing latest listings' : 'No matches found';
-    }
-
-    if (filteredVehicles.length === 0) {
-      grid.innerHTML = '<div class="empty">No vehicles match those filters yet. Try a wider budget or location.</div>';
-      return;
-    }
-
-    grid.innerHTML = filteredVehicles.map(listingCard).join('');
+    var grid = document.getElementById('results-grid'); if (!grid) return;
+    var count = document.getElementById('result-count'), summary = document.getElementById('result-summary');
+    if (count) count.textContent = filteredVehicles.length + ' vehicle' + (filteredVehicles.length === 1 ? '' : 's') + ' found';
+    if (summary) summary.textContent = filteredVehicles.length ? 'Showing latest listings' : 'No matches found';
+    grid.innerHTML = filteredVehicles.length ? filteredVehicles.map(listingCard).join('') : '<div class="empty">No vehicles match those filters yet. Try a wider budget or location.</div>';
+    if (typeof window.updateMarketplaceCTAs === 'function') window.updateMarketplaceCTAs();
   }
 
-  // ---------- Clear filters ----------
   function clearFilters() {
-    ['q', 'make', 'location', 'body', 'monthly', 'cash', 'min-monthly', 'min-cash'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-    var sortEl = document.getElementById('sort');
-    if (sortEl) sortEl.value = 'new';
-    applyFilters();
+    ['q','make','location','body','monthly','cash','min-monthly','min-cash'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    var sort=document.getElementById('sort');if(sort)sort.value='new';applyFilters();
   }
 
-  // ---------- Load data ----------
-  function loadVehicles() {
-    var grid = document.getElementById('results-grid');
-    if (grid) {
-      grid.innerHTML = '<div class="empty">Loading marketplace...</div>';
+  async function fetchJson(url, timeoutMs) {
+    var controller = new AbortController();
+    var timer = setTimeout(function(){controller.abort();}, timeoutMs || 10000);
+    try {
+      var response = await fetch(url, {cache:'no-store', headers:{Accept:'application/json'}, signal:controller.signal});
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return await response.json();
+    } finally { clearTimeout(timer); }
+  }
+
+  async function loadVehicles() {
+    var grid=document.getElementById('results-grid');
+    if(grid)grid.innerHTML='<div class="empty">Loading marketplace...</div>';
+    var sources=[
+      new URL('data/vehicles.json?v=' + Date.now(), document.baseURI).href,
+      'https://raw.githubusercontent.com/Pasalo-Cars-PH/Pasalo-Assumed-Balance-Marketplace/v1-marketplace/data/vehicles.json?v=' + Date.now()
+    ];
+    var lastError;
+    for(var i=0;i<sources.length;i++){
+      try{
+        var data=await fetchJson(sources[i],10000);
+        var list=Array.isArray(data.vehicles)?data.vehicles:[];
+        if(!list.length) throw new Error('Vehicle data is empty');
+        allVehicles=list;
+        window.vehicles=allVehicles;
+        populateFilters(); applyFilters();
+        console.log('✅ Marketplace loaded:', allVehicles.length, 'vehicles from', sources[i]);
+        return;
+      }catch(err){lastError=err;console.warn('Marketplace data source failed:',sources[i],err);}
     }
-
-    fetch('https://pasalo-cars-ph.github.io/Pasalo-Assumed-Balance-Marketplace/data/vehicles.json?v=' + Date.now(), {
-      cache: 'no-store',
-      headers: { Accept: 'application/json' }
-    })
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        allVehicles = Array.isArray(data.vehicles) ? data.vehicles : [];
-        window.vehicles = allVehicles; // for data-recovery.js compatibility
-
-        populateFilters();
-        applyFilters();
-
-        console.log('✅ Marketplace loaded', allVehicles.length, 'vehicles');
-      })
-      .catch(function (err) {
-        console.error('Failed to load vehicles.json', err);
-        if (grid) {
-          grid.innerHTML =
-            '<div class="empty">Could not load vehicle data. <button type="button" class="btn btn-secondary" id="retry-listings">Retry</button></div>';
-          document.getElementById('retry-listings')?.addEventListener('click', loadVehicles);
-        }
-      });
+    console.error('Marketplace failed to load:',lastError);
+    if(grid)grid.innerHTML='<div class="empty"><b>Marketplace data could not be loaded.</b><br>Please tap Retry.<br><button type="button" class="btn btn-secondary" id="retry-listings" style="margin-top:12px">Retry</button></div>';
+    document.getElementById('retry-listings')?.addEventListener('click',loadVehicles);
   }
 
-  // ---------- Expose for data-recovery.js ----------
-  window.renderListings = applyFilters;
+  window.renderListings=applyFilters;
 
-  // ---------- Boot ----------
-  document.addEventListener('DOMContentLoaded', function () {
-    // Only run on listings page
-    if (!document.getElementById('results-grid')) return;
-
-    document.getElementById('apply')?.addEventListener('click', applyFilters);
-    document.getElementById('clear-filters')?.addEventListener('click', clearFilters);
-    document.getElementById('sort')?.addEventListener('change', applyFilters);
-
-    // Live search (optional)
-    document.getElementById('q')?.addEventListener('input', function () {
-      clearTimeout(window._searchTimer);
-      window._searchTimer = setTimeout(applyFilters, 300);
-    });
-
+  document.addEventListener('DOMContentLoaded',function(){
+    if(!document.getElementById('results-grid'))return;
+    document.getElementById('apply')?.addEventListener('click',applyFilters);
+    document.getElementById('clear-filters')?.addEventListener('click',clearFilters);
+    document.getElementById('sort')?.addEventListener('change',applyFilters);
+    document.getElementById('q')?.addEventListener('input',function(){clearTimeout(window._searchTimer);window._searchTimer=setTimeout(applyFilters,250);});
     loadVehicles();
   });
 })();
