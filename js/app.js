@@ -1,70 +1,255 @@
-const money=n=>n==null||n===''?'Ask for monthly':'₱'+Number(String(n).replace(/[^0-9.-]/g,'')).toLocaleString('en-PH');
-const show=v=>v==null||v===''?'To confirm':v;
-const title=v=>`${v.make||''} ${v.model||''}${v.variant&&v.variant!=='—'?` ${v.variant}`:''}${v.year&&v.year!=='—'?` ${v.year}`:''}`.trim();
-const qs=s=>new URLSearchParams(location.search).get(s);
-const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const numeric=v=>Number(String(v??'').replace(/[^0-9.-]/g,''))||0;
-const imageUrl=v=>{const raw=Array.isArray(v.images)?v.images[0]:v.image;if(!raw)return null;const p=String(raw).trim();if(/^https?:\/\//i.test(p))return p;return new URL(p.replace(/^\.\//,''),document.baseURI).href};
-const img=v=>{const src=imageUrl(v);if(!src)return `<span class="image-fallback">${escapeHtml(v.emoji||'🚗')}</span>`;return `<img src="${escapeHtml(src)}" alt="${escapeHtml(title(v))}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.classList.add('image-failed');this.parentElement.insertAdjacentHTML('beforeend','<span class=\"image-fallback\">${escapeHtml(v.emoji||'🚗')}</span>')">`};
-let vehicles=[];
-let visibleCount=9;
-const SUPABASE_URL='https://jpktdmpcodwdmaucvmgd.supabase.co';
-const SUPABASE_KEY='sb_publishable_wvefX4h41g-0X2XX8Lp-pg_t2R9Qmwn';
-const DATA_VERSION='20260819-1';
-const LOCAL_IMAGE_OVERRIDES={'PCPH-000007':'images/PCPH-000007.webp','PCPH-000008':'images/PCPH-000008.webp','PCPH-000009':'images/PCPH-000009.webp','PCPH-000026':'images/PCPH-000026.webp','PCPH-000027':'images/PCPH-000027.webp'};
+/* ============================================================================
+   PASALO CARS PH - MAIN APPLICATION SCRIPT
+   ============================================================================ */
 
-async function fetchJson(path){
-  const url=new URL(path,document.baseURI);
-  url.searchParams.set('v',DATA_VERSION);
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),10000);
-  try{
-    const r=await fetch(url.href,{cache:'no-store',headers:{Accept:'application/json'},signal:controller.signal});
-    if(!r.ok)throw new Error(`${path} returned HTTP ${r.status}`);
-    return await r.json();
-  }finally{clearTimeout(timer)}
-}
+// Mobile Menu Toggle
+document.addEventListener('DOMContentLoaded', function() {
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mobileNav = document.querySelector('.nav-mobile');
+  const mainNav = document.querySelector('#main-nav');
 
-async function loadVehicles(){
-  const sources=['data/vehicles.json','data/vehicles-extra.json','data/vehicles-new.json'];
-  const results=await Promise.allSettled(sources.map(fetchJson));
-  const errors=[];
-  results.forEach((r,i)=>{if(r.status==='rejected')errors.push(`${sources[i]}: ${r.reason?.message||r.reason}`)});
-  const loaded=results.filter(r=>r.status==='fulfilled').map(r=>r.value?.vehicles||[]).flat();
-  const byId=new Map(loaded.map(v=>[v.id,v]));
-  vehicles=[...byId.values()].map(v=>LOCAL_IMAGE_OVERRIDES[v.id]?{...v,image:LOCAL_IMAGE_OVERRIDES[v.id]}:v);
-  if(!vehicles.length)throw new Error(errors.join(' | ')||'No vehicle records found');
-  console.info(`Marketplace loaded ${vehicles.length} vehicles`,errors.length?errors:undefined);
-  renderHome();renderListings();renderVehicle();
-}
+  // Toggle mobile menu
+  if (menuToggle && mobileNav) {
+    menuToggle.addEventListener('click', function() {
+      const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', !isExpanded);
+      mobileNav.setAttribute('aria-hidden', isExpanded);
+    });
 
-loadVehicles().catch(err=>{
-  console.error('Marketplace data load failed:',err);
-  document.querySelectorAll('#featured-list,#results-grid,#vehicle-root').forEach(el=>{if(el)el.innerHTML=`<div class="empty"><strong>Marketplace data could not be loaded.</strong><br>Please refresh once. If this continues, the data files are temporarily unavailable.<br><small>${escapeHtml(err.message||err)}</small></div>`});
+    // Close menu when link clicked
+    const mobileLinks = mobileNav.querySelectorAll('a');
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        menuToggle.setAttribute('aria-expanded', 'false');
+        mobileNav.setAttribute('aria-hidden', 'true');
+      });
+    });
+  }
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(event) {
+    const isClickInsideMenu = mobileNav && mobileNav.contains(event.target);
+    const isClickInsideToggle = menuToggle && menuToggle.contains(event.target);
+    const isMenuOpen = menuToggle && menuToggle.getAttribute('aria-expanded') === 'true';
+
+    if (!isClickInsideMenu && !isClickInsideToggle && isMenuOpen) {
+      menuToggle.setAttribute('aria-expanded', 'false');
+      mobileNav.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    if (window.innerWidth >= 768) {
+      if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+      if (mobileNav) mobileNav.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href !== '#') {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  });
+
+  // Form submission handling
+  const searchBox = document.querySelector('.search-box');
+  if (searchBox) {
+    searchBox.addEventListener('submit', function(e) {
+      // Let form submit naturally to listings.html
+      // This event handler can be extended for client-side filtering if needed
+    });
+  }
+
+  // Populate featured listings (demo data)
+  populateFeaturedListings();
+
+  // Performance: Log when page is loaded
+  console.log('✅ Pasalo Cars PH loaded successfully');
 });
 
-function age(v){
-  const t=new Date(v.listedAt).getTime();
-  if(!Number.isFinite(t))return 'Recently listed';
-  const diff=Math.max(0,Date.now()-t),mins=Math.floor(diff/60000);
-  if(mins<1)return 'Listed just now';
-  if(mins<60)return `Listed ${mins} min ago`;
-  const hrs=Math.floor(mins/60);
-  if(hrs<24)return `Listed ${hrs} hr ago`;
-  const days=Math.floor(hrs/24);
-  if(days<7)return `Listed ${days} day${days===1?'':'s'} ago`;
-  const weeks=Math.floor(days/7);
-  if(weeks<5)return `Listed ${weeks} week${weeks===1?'':'s'} ago`;
-  return `Listed ${days} days ago`;
+/**
+ * Populate Featured Listings Section
+ * Replace with actual API call in production
+ */
+function populateFeaturedListings() {
+  const featuredList = document.querySelector('#featured-list');
+  if (!featuredList) return;
+
+  // Sample vehicle data (replace with actual API data)
+  const vehicles = [
+    {
+      id: 1,
+      title: 'Toyota Zenix Q Hybrid 2026',
+      image: 'https://via.placeholder.com/400x225?text=Toyota+Zenix',
+      cashOut: '₱350,000',
+      monthly: '₱42,338 / month',
+      location: 'Toyota Abad Santos',
+      financing: 'Toyota Financial Services (TFS)',
+      postedDaysAgo: 2,
+      status: 'To confirm'
+    },
+    {
+      id: 2,
+      title: 'Nissan Terra VE 4x2 Automatic 2026',
+      image: 'https://via.placeholder.com/400x225?text=Nissan+Terra',
+      cashOut: '₱300,000',
+      monthly: '₱40,700 / month',
+      location: 'Nissan Dealer',
+      financing: 'To confirm',
+      postedDaysAgo: 2,
+      status: 'Mandainyong'
+    },
+    {
+      id: 3,
+      title: 'Toyota Corolla Cross HEV CVT 2026',
+      image: 'https://via.placeholder.com/400x225?text=Toyota+Corolla',
+      cashOut: '₱245,000',
+      monthly: '₱36,000 / month',
+      location: 'Toyota Financial Services (TFS)',
+      financing: 'Toyota Financial Services (TFS)',
+      postedDaysAgo: 5,
+      status: 'Listed 5 days ago'
+    }
+  ];
+
+  // Render vehicles
+  featuredList.innerHTML = vehicles.map(vehicle => `
+    <article class="vehicle-card">
+      <img src="${vehicle.image}" alt="${vehicle.title}" class="vehicle-image">
+      <div class="vehicle-info">
+        <h3 class="vehicle-title">${vehicle.title}</h3>
+        
+        <div>
+          <div class="vehicle-price-label">CASH-OUT</div>
+          <div class="vehicle-price">${vehicle.cashOut}</div>
+          <div class="vehicle-monthly">${vehicle.monthly}</div>
+        </div>
+
+        <div class="vehicle-details">
+          <div class="vehicle-detail-item">
+            <span>📍 ${vehicle.location}</span>
+          </div>
+          <div class="vehicle-detail-item">
+            <span>🏦 ${vehicle.financing}</span>
+          </div>
+          <div class="vehicle-detail-item">
+            <span>⏱️ ${vehicle.status}</span>
+          </div>
+        </div>
+
+        <div class="vehicle-actions">
+          <a href="listing-details.html?id=${vehicle.id}" class="btn btn-secondary">View Details</a>
+          <button type="button" class="btn btn-primary" data-vehicle-id="${vehicle.id}">Inquire</button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  // Add event listeners to inquire buttons
+  document.querySelectorAll('[data-vehicle-id]').forEach(button => {
+    button.addEventListener('click', function() {
+      const vehicleId = this.getAttribute('data-vehicle-id');
+      handleInquire(vehicleId);
+    });
+  });
 }
 
-function card(v){return `<article class="vehicle-card"><div class="vehicle-image">${img(v)}${v.color?`<span class="badge">${escapeHtml(v.color)}</span>`:''}${v.verified?'<span class="badge">🟢 VERIFIED</span>':''}</div><div class="vehicle-body"><div class="vehicle-title">${escapeHtml(title(v))}</div><div class="vehicle-price">${money(v.cashOut)}</div><div class="vehicle-monthly">${money(v.monthly)}${v.monthly!=null?' / month':''}</div><div class="vehicle-meta"><span>📍 ${escapeHtml(show(v.location))}</span><span>🏦 ${escapeHtml(show(v.bank))}</span><span>🕒 ${escapeHtml(age(v))}</span></div><a class="btn btn-secondary" href="vehicle.html?id=${encodeURIComponent(v.id)}">View Details</a></div></article>`}
-function renderHome(){const el=document.querySelector('#featured-list');if(el)el.innerHTML=vehicles.filter(v=>v.status==='active').sort((a,b)=>new Date(b.listedAt)-new Date(a.listedAt)).slice(0,6).map(card).join('')}
-function fillSelect(id,values,label){const el=document.querySelector(id);if(!el)return;const current=el.value;el.innerHTML=`<option value="">${label}</option>`+values.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');if(values.includes(current))el.value=current}
-function populateMarketplaceFilters(){const active=vehicles.filter(v=>v.status==='active');fillSelect('#make',[...new Set(active.map(v=>v.make).filter(Boolean))].sort(),'Any brand');fillSelect('#location',[...new Set(active.map(v=>v.location).filter(v=>v&&v!=='To confirm'))].sort(),'Any location');fillSelect('#body',[...new Set(active.map(v=>v.bodyType).filter(Boolean))].sort(),'Any type')}
-function renderListings(){const grid=document.querySelector('#results-grid');if(!grid)return;populateMarketplaceFilters();const qEl=document.querySelector('#q'),makeEl=document.querySelector('#make'),locEl=document.querySelector('#location'),bodyEl=document.querySelector('#body'),monthlyEl=document.querySelector('#monthly'),cashEl=document.querySelector('#cash'),minMonthlyEl=document.querySelector('#min-monthly'),minCashEl=document.querySelector('#min-cash'),sortEl=document.querySelector('#sort');if(qEl)qEl.value=qs('q')||'';if(makeEl)makeEl.value=qs('make')||'';if(locEl)locEl.value=qs('location')||'';if(bodyEl)bodyEl.value=qs('body')||'';if(monthlyEl)monthlyEl.value=qs('monthly')||'';if(cashEl)cashEl.value=qs('cash')||'';if(minMonthlyEl)minMonthlyEl.value=qs('minMonthly')||'';if(minCashEl)minCashEl.value=qs('minCash')||'';if(sortEl)sortEl.value=qs('sort')||'new';const getList=()=>{const q=(qEl?.value||'').trim().toLowerCase(),make=makeEl?.value||'',loc=locEl?.value||'',body=bodyEl?.value||'',maxMonthly=Number(monthlyEl?.value)||Infinity,maxCash=Number(cashEl?.value)||Infinity,minMonthly=Number(minMonthlyEl?.value)||0,minCash=Number(minCashEl?.value)||0;let list=vehicles.filter(v=>{const hay=`${v.make} ${v.model} ${v.variant} ${v.color} ${v.location} ${v.fuelType}`.toLowerCase();const m=v.monthly==null?Infinity:numeric(v.monthly),c=v.cashOut==null?Infinity:numeric(v.cashOut);return v.status==='active'&&(!q||hay.includes(q))&&(!make||v.make===make)&&(!loc||v.location===loc)&&(!body||v.bodyType===body)&&m<=maxMonthly&&c<=maxCash&&m>=minMonthly&&c>=minCash});const sort=sortEl?.value||'new';if(sort==='monthly')list.sort((a,b)=>(a.monthly??Infinity)-(b.monthly??Infinity));else if(sort==='cash')list.sort((a,b)=>numeric(a.cashOut||Infinity)-numeric(b.cashOut||Infinity));else if(sort==='year')list.sort((a,b)=>(Number(b.year)||0)-(Number(a.year)||0));else list.sort((a,b)=>new Date(b.listedAt)-new Date(a.listedAt));return list};const draw=()=>{const list=getList(),count=document.querySelector('#result-count'),summary=document.querySelector('#result-summary'),wrap=document.querySelector('#load-more-wrap'),moreCount=document.querySelector('#load-more-count'),chips=document.querySelector('#active-filters'),shown=list.slice(0,visibleCount);if(count)count.textContent=`${list.length} vehicle${list.length===1?'':'s'} found`;if(summary)summary.textContent=list.length?`Showing ${shown.length} of ${list.length} available listings`:'Try a wider budget or remove a filter.';grid.innerHTML=list.length?shown.map(card).join(''):'<div class="empty"><strong>No matching vehicles yet.</strong><br>Try increasing your maximum monthly/cash-out or clearing a filter.</div>';if(wrap)wrap.classList.toggle('hidden',shown.length>=list.length||!list.length);if(moreCount)moreCount.textContent=shown.length<list.length?`${list.length-shown.length} more available`:'';if(chips){const labels=[];if(qEl?.value)labels.push(`Search: ${qEl.value}`);if(makeEl?.value)labels.push(makeEl.value);if(locEl?.value)labels.push(locEl.value);if(bodyEl?.value)labels.push(bodyEl.value);if(minMonthlyEl?.value)labels.push(`Monthly ≥ ₱${numeric(minMonthlyEl.value).toLocaleString()}`);if(monthlyEl?.value)labels.push(`Monthly ≤ ₱${numeric(monthlyEl.value).toLocaleString()}`);if(minCashEl?.value)labels.push(`Cash-out ≥ ₱${numeric(minCashEl.value).toLocaleString()}`);if(cashEl?.value)labels.push(`Cash-out ≤ ₱${numeric(cashEl.value).toLocaleString()}`);chips.innerHTML=labels.map(x=>`<span class="filter-chip">${escapeHtml(x)}</span>`).join('')}};const applyUrl=()=>{const u=new URL(location.href);[['q',qEl],['make',makeEl],['location',locEl],['body',bodyEl],['monthly',monthlyEl],['cash',cashEl],['minMonthly',minMonthlyEl],['minCash',minCashEl],['sort',sortEl]].forEach(([k,el])=>{const v=el?.value||'';if(v)u.searchParams.set(k,v);else u.searchParams.delete(k)});history.replaceState({},'',u)};document.querySelector('#apply')?.addEventListener('click',()=>{visibleCount=9;applyUrl();draw()});document.querySelector('#clear-filters')?.addEventListener('click',()=>{[qEl,makeEl,locEl,bodyEl,monthlyEl,cashEl,minMonthlyEl,minCashEl].forEach(el=>{if(el)el.value=''});if(sortEl)sortEl.value='new';visibleCount=9;applyUrl();draw()});sortEl?.addEventListener('change',()=>{visibleCount=9;applyUrl();draw()});document.querySelector('#load-more')?.addEventListener('click',()=>{visibleCount+=9;draw()});draw()}
-async function saveInquiry(v,data){const body={buyer_name:data.get('name'),buyer_mobile:data.get('mobile'),buyer_location:data.get('location'),preferred_contact:data.get('contact'),monthly_budget:Number(String(data.get('monthly')||'').replace(/[^0-9.]/g,''))||null,cashout_budget:Number(String(data.get('cash')||'').replace(/[^0-9.]/g,''))||null,unit_id:v.id,unit_name:title(v),listing_owner_name:v.agent?.name||v.owner?.name||null,listing_owner_facebook:v.agent?.facebook||v.owner?.facebook||null,listing_owner_mobile:v.agent?.mobile||v.owner?.mobile||null,inquiry_message:`Marketplace inquiry for ${title(v)}`,source:'pasalo-marketplace'};const r=await fetch(`${SUPABASE_URL}/rest/v1/marketplace_inquiries`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return true}
-function renderVehicle(){const root=document.querySelector('#vehicle-root');if(!root)return;const id=qs('id'),v=vehicles.find(x=>x.id===id);if(!v){root.innerHTML='<div class="empty">Vehicle not found. <a href="listings.html">Browse available vehicles →</a></div>';return}root.innerHTML=`<div class="detail-top"><div class="detail-photo">${img(v)}</div><div class="detail-card"><span class="eyebrow">${v.verified?'🟢 VERIFIED LISTING':'AVAILABLE LISTING'}</span><h1>${escapeHtml(title(v))}</h1><p class="vehicle-meta">📍 ${escapeHtml(show(v.location))} • 🏦 ${escapeHtml(show(v.bank))} • ${escapeHtml(age(v))}</p><div class="detail-price">${money(v.cashOut)}</div><p>Cash-out</p><div class="vehicle-monthly">${money(v.monthly)}${v.monthly!=null?' / month':''}</div><button id="inquire-btn" class="btn btn-primary" style="width:100%;margin-top:22px">Inquire Now</button></div></div><section><h2>Vehicle details</h2><div class="specs">${[['Year',v.year],['Variant',v.variant],['Color',v.color],['Body Type',v.bodyType],['Transmission',v.transmission],['Fuel Type',v.fuelType],['Mileage',v.mileage==null?'To confirm':v.mileage],['Months Paid',v.monthsPaid],['Months Remaining',v.monthsRemaining],['Bank',v.bank],['Next Due',v.nextDue]].map(a=>`<div class="spec"><small>${escapeHtml(a[0])}</small><b>${escapeHtml(show(a[1]))}</b></div>`).join('')}</div></section><div id="inquiry" class="detail-card hidden"><span class="eyebrow">QUICK INQUIRY</span><h2>Interested in this vehicle?</h2><form id="inquiry-form" class="form"><div class="form-grid"><div class="form-group"><label>Monthly budget</label><select name="monthly" required><option value="15000">₱15K–₱20K</option><option value="20000">₱20K–₱25K</option><option value="25000">₱25K–₱30K</option><option value="30000">₱30K+</option></select></div><div class="form-group"><label>Cash-out available</label><input name="cash" required placeholder="e.g. ₱200,000"></div><div class="form-group"><label>Location</label><input name="location" required placeholder="City / Province"></div><div class="form-group"><label>Full name</label><input name="name" required></div><div class="form-group"><label>Mobile number</label><input name="mobile" required></div><div class="form-group"><label>Preferred contact</label><select name="contact"><option>Messenger</option><option>Call</option><option>SMS</option></select></div></div><button type="submit" class="btn btn-primary">Get Vehicle Details</button></form><div id="inquiry-success" class="notice hidden">Thanks! Your inquiry has been received by Pasalo Cars PH. We’ll help you with the next steps.</div><div id="inquiry-error" class="notice hidden">We couldn't save your inquiry yet. Please try again.</div></div>`;document.querySelector('#inquire-btn')?.addEventListener('click',()=>{const box=document.querySelector('#inquiry');box.classList.remove('hidden');box.scrollIntoView({behavior:'smooth',block:'start'})});document.querySelector('#inquiry-form')?.addEventListener('submit',async e=>{e.preventDefault();const form=e.target,button=form.querySelector('button'),success=document.querySelector('#inquiry-success'),error=document.querySelector('#inquiry-error');button.disabled=true;button.textContent='Sending...';try{await saveInquiry(v,new FormData(form));form.classList.add('hidden');success.classList.remove('hidden')}catch(err){console.error(err);error.classList.remove('hidden');button.disabled=false;button.textContent='Get Vehicle Details'}})}
-function startMatch(){const f=document.querySelector('#matcher');if(!f)return;const result=document.querySelector('#match-results');f.addEventListener('submit',e=>{e.preventDefault();const data=new FormData(f),budget=Number(data.get('budget'))||Infinity,cash=Number(data.get('cash'))||Infinity,loc=data.get('location'),type=data.get('type');const ranked=vehicles.filter(v=>v.status==='active').map(v=>{let s=100-(v.monthly!=null&&v.monthly>budget?25:0)-(numeric(v.cashOut)>cash?25:0)-(loc&&v.location!=='To confirm'&&loc!==v.location?10:0)-(type&&type!=='Any'&&v.bodyType!==type?15:0);return {...v,score:Math.max(50,s)}}).sort((a,b)=>b.score-a.score).slice(0,3);result.innerHTML=`<h2>Your best matches</h2><div class="vehicle-grid">${ranked.map(v=>`<article class="vehicle-card"><div class="vehicle-image">${img(v)}</div><div class="vehicle-body"><span class="eyebrow">${v.score}% MATCH</span><div class="vehicle-title">${escapeHtml(title(v))}</div><div class="vehicle-price">${money(v.cashOut)}</div><div class="vehicle-monthly">${money(v.monthly)}${v.monthly!=null?' / month':''}</div><p class="vehicle-meta">📍 ${escapeHtml(show(v.location))}</p><a class="btn btn-primary" href="vehicle.html?id=${encodeURIComponent(v.id)}">View Deal</a></div></article>`).join('')}</div>`;result.classList.remove('hidden')})}
-function setupMobileNav(){const header=document.querySelector('.site-header');if(!header)return;let b=header.querySelector('.menu-toggle');if(!b){b=document.createElement('button');b.className='menu-toggle';b.type='button';b.setAttribute('aria-label','Open menu');b.setAttribute('aria-expanded','false');b.textContent='☰';header.insertBefore(b,header.querySelector('nav'))}let n=document.querySelector('.mobile-nav');if(!n){n=document.createElement('div');n.className='mobile-nav';n.setAttribute('aria-hidden','true');n.innerHTML='<a href="listings.html">Buy a Car</a><a href="list-your-car.html">Sell / Pasalo</a><a href="find-my-car.html">Find My Car</a><a href="how-it-works.html">How It Works</a>';document.body.insertBefore(n,document.body.firstChild)}b.addEventListener('click',()=>{const open=n.classList.toggle('open');b.setAttribute('aria-expanded',String(open));n.setAttribute('aria-hidden',String(!open));b.textContent=open?'✕':'☰'});n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{n.classList.remove('open');b.setAttribute('aria-expanded','false');n.setAttribute('aria-hidden','true');b.textContent='☰'}))}
-startMatch();setupMobileNav();setInterval(()=>{document.querySelectorAll('.vehicle-meta').forEach(el=>{const spans=el.querySelectorAll('span');spans.forEach(p=>{const text=p.textContent||'';if(text.includes('Listed ')){const v=vehicles.find(x=>text.includes(title(x)));if(v)p.textContent=`🕒 ${age(v)}`}})});},60000);
+/**
+ * Handle Vehicle Inquiry
+ * @param {number} vehicleId - The vehicle ID
+ */
+function handleInquire(vehicleId) {
+  console.log(`Inquiry for vehicle ${vehicleId}`);
+  // Redirect to inquiry form or open modal
+  window.location.href = `inquire.html?vehicle=${vehicleId}`;
+}
+
+/**
+ * Debounce function for search input
+ * @param {function} func - Function to debounce
+ * @param {number} wait - Wait time in ms
+ */
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Handle real-time search (optional enhancement)
+ */
+function initializeSearch() {
+  const searchInput = document.querySelector('.search-box input[type="search"]');
+  if (!searchInput) return;
+
+  const handleSearch = debounce(function(e) {
+    const query = e.target.value.trim();
+    if (query.length >= 2) {
+      // Perform search - can be replaced with API call
+      console.log('Searching for:', query);
+    }
+  }, 300);
+
+  searchInput.addEventListener('input', handleSearch);
+}
+
+/**
+ * Intersection Observer for lazy loading and animations
+ */
+function initializeObserver() {
+  if (!('IntersectionObserver' in window)) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animation = 'slideUp 0.6s ease forwards';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.vehicle-card, .category-card').forEach(card => {
+    observer.observe(card);
+  });
+}
+
+// Initialize additional features
+document.addEventListener('DOMContentLoaded', function() {
+  initializeSearch();
+  initializeObserver();
+});
+
+/**
+ * Utility: Get URL parameter
+ * @param {string} param - Parameter name
+ */
+function getUrlParameter(param) {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  return urlParams.get(param);
+}
+
+/**
+ * Utility: Track user actions (analytics)
+ * @param {string} action - Action name
+ * @param {object} data - Additional data
+ */
+function trackEvent(action, data = {}) {
+  console.log(`📊 Event: ${action}`, data);
+  // Replace with actual analytics tracking (GA, Mixpanel, etc.)
+}
