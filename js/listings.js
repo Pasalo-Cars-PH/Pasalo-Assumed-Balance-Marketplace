@@ -210,7 +210,7 @@
       grid.innerHTML = '<div class="empty">Loading marketplace...</div>';
     }
 
-    fetch('data/vehicles.json?v=' + Date.now(), {
+    fetch('https://pasalo-cars-ph.github.io/Pasalo-Assumed-Balance-Marketplace/data/vehicles.json?v=' + Date.now(), {
       cache: 'no-store',
       headers: { Accept: 'application/json' }
     })
