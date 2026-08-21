@@ -1,255 +1,279 @@
 /* ============================================================================
-   PASALO CARS PH - MAIN APPLICATION SCRIPT
+   PASALO CARS PH - MAIN APPLICATION SCRIPT (FIXED)
+   - Mobile nav
+   - Featured listings from data/vehicles.json
+   - Null-safe money display
+   - Image fallback
    ============================================================================ */
 
-// Mobile Menu Toggle
-document.addEventListener('DOMContentLoaded', function() {
-  const menuToggle = document.querySelector('.menu-toggle');
-  const mobileNav = document.querySelector('.nav-mobile');
-  const mainNav = document.querySelector('#main-nav');
+(function () {
+  'use strict';
 
-  // Toggle mobile menu
-  if (menuToggle && mobileNav) {
-    menuToggle.addEventListener('click', function() {
-      const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
-      menuToggle.setAttribute('aria-expanded', !isExpanded);
-      mobileNav.setAttribute('aria-hidden', isExpanded);
+  // ---------- helpers ----------
+  function money(n, fallback) {
+    fallback = fallback || 'PM for details';
+    if (n == null || n === '' || Number.isNaN(Number(n))) return fallback;
+    return '₱' + Number(n).toLocaleString('en-PH');
+  }
+
+  function show(v) {
+    return v == null || v === '' ? 'To confirm' : String(v);
+  }
+
+  function vehicleTitle(v) {
+    return [v.make, v.model, v.variant && v.variant !== '—' ? v.variant : '', v.year && v.year !== '—' ? v.year : '']
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  function ageLabel(v) {
+    if (!v.listedAt) return 'Listed recently';
+    var h = Math.max(0, (Date.now() - new Date(v.listedAt).getTime()) / 36e5);
+    if (h < 1) return 'Listed ' + Math.max(1, Math.round(h * 60)) + ' min ago';
+    if (h < 24) return 'Listed ' + Math.round(h) + ' hr ago';
+    var d = Math.round(h / 24);
+    return 'Listed ' + d + ' day' + (d === 1 ? '' : 's') + ' ago';
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function getUrlParameter(param) {
+    return new URLSearchParams(window.location.search).get(param);
+  }
+
+  function trackEvent(action, data) {
+    console.log('📊 Event: ' + action, data || {});
+  }
+
+  function debounce(func, wait) {
+    var timeout;
+    return function executedFunction() {
+      var args = arguments;
+      var later = function () {
+        clearTimeout(timeout);
+        func.apply(null, args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  // Shared catalog (also used by listings pages if same app.js)
+  var vehicles = [];
+
+  // ---------- mobile menu ----------
+  function setupMobileMenu() {
+    var menuToggle = document.querySelector('.menu-toggle');
+    var mobileNav = document.querySelector('.nav-mobile') || document.querySelector('.mobile-nav') || document.querySelector('#mobile-nav');
+
+    if (!menuToggle || !mobileNav) return;
+
+    function setOpen(open) {
+      menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      mobileNav.setAttribute('aria-hidden', open ? 'false' : 'true');
+      mobileNav.classList.toggle('open', open);
+      // optional visual for hamburger
+      if (menuToggle.textContent.trim() === '☰' || menuToggle.textContent.trim() === '✕') {
+        menuToggle.textContent = open ? '✕' : '☰';
+      }
+    }
+
+    menuToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      setOpen(!isExpanded);
     });
 
-    // Close menu when link clicked
-    const mobileLinks = mobileNav.querySelectorAll('a');
-    mobileLinks.forEach(link => {
-      link.addEventListener('click', function() {
-        menuToggle.setAttribute('aria-expanded', 'false');
-        mobileNav.setAttribute('aria-hidden', 'true');
+    mobileNav.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        setOpen(false);
+      });
+    });
+
+    document.addEventListener('click', function (event) {
+      var isClickInsideMenu = mobileNav.contains(event.target);
+      var isClickInsideToggle = menuToggle.contains(event.target);
+      var isMenuOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+      if (!isClickInsideMenu && !isClickInsideToggle && isMenuOpen) {
+        setOpen(false);
+      }
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 768) setOpen(false);
+    });
+  }
+
+  // ---------- smooth scroll ----------
+  function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+      anchor.addEventListener('click', function (e) {
+        var href = this.getAttribute('href');
+        if (!href || href === '#') return;
+        var target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
       });
     });
   }
 
-  // Close menu when clicking outside
-  document.addEventListener('click', function(event) {
-    const isClickInsideMenu = mobileNav && mobileNav.contains(event.target);
-    const isClickInsideToggle = menuToggle && menuToggle.contains(event.target);
-    const isMenuOpen = menuToggle && menuToggle.getAttribute('aria-expanded') === 'true';
+  // ---------- featured cards (matches your index.html classes) ----------
+  function featuredCard(v) {
+    var t = vehicleTitle(v);
+    var img = v.image
+      ? '<img src="' + escapeHtml(v.image) + '" alt="' + escapeHtml(t) + '" class="vehicle-image" loading="lazy" onerror="this.style.display=\'none\'">'
+      : '';
+    var emoji = escapeHtml(v.emoji || '🚗');
 
-    if (!isClickInsideMenu && !isClickInsideToggle && isMenuOpen) {
-      menuToggle.setAttribute('aria-expanded', 'false');
-      mobileNav.setAttribute('aria-hidden', 'true');
+    return (
+      '<article class="vehicle-card">' +
+      (img || '<div class="vehicle-image" style="display:grid;place-items:center;font-size:48px;background:#edf0f4">' + emoji + '</div>') +
+      '<div class="vehicle-info">' +
+      '<h3 class="vehicle-title">' + escapeHtml(t) + '</h3>' +
+      '<div>' +
+      '<div class="vehicle-price-label">CASH-OUT</div>' +
+      '<div class="vehicle-price">' + money(v.cashOut) + '</div>' +
+      '<div class="vehicle-monthly">' + money(v.monthly) + (v.monthly != null ? ' / month' : '') + '</div>' +
+      '</div>' +
+      '<div class="vehicle-details">' +
+      '<div class="vehicle-detail-item"><span>📍 ' + escapeHtml(show(v.location)) + '</span></div>' +
+      '<div class="vehicle-detail-item"><span>🏦 ' + escapeHtml(show(v.bank)) + '</span></div>' +
+      '<div class="vehicle-detail-item"><span>⏱️ ' + escapeHtml(ageLabel(v)) + '</span></div>' +
+      '</div>' +
+      '<div class="vehicle-actions">' +
+      '<a href="vehicle.html?id=' + encodeURIComponent(v.id) + '" class="btn btn-secondary">View Details</a>' +
+      '<button type="button" class="btn btn-primary" data-vehicle-id="' + escapeHtml(v.id) + '">Inquire</button>' +
+      '</div>' +
+      '</div>' +
+      '</article>'
+    );
+  }
+
+  function populateFeaturedListings() {
+    var featuredList = document.querySelector('#featured-list');
+    if (!featuredList) return;
+
+    var list = vehicles
+      .filter(function (v) {
+        return v.status === 'active';
+      })
+      .sort(function (a, b) {
+        return new Date(b.listedAt || 0) - new Date(a.listedAt || 0);
+      })
+      .slice(0, 6);
+
+    if (!list.length) {
+      featuredList.innerHTML = '<div class="empty">No featured vehicles yet. Check back soon.</div>';
+      return;
     }
-  });
 
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    if (window.innerWidth >= 768) {
-      if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
-      if (mobileNav) mobileNav.setAttribute('aria-hidden', 'true');
-    }
-  });
+    featuredList.innerHTML = list.map(featuredCard).join('');
 
-  // Smooth scrolling for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      const href = this.getAttribute('href');
-      if (href !== '#') {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-    });
-  });
-
-  // Form submission handling
-  const searchBox = document.querySelector('.search-box');
-  if (searchBox) {
-    searchBox.addEventListener('submit', function(e) {
-      // Let form submit naturally to listings.html
-      // This event handler can be extended for client-side filtering if needed
+    featuredList.querySelectorAll('[data-vehicle-id]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        handleInquire(this.getAttribute('data-vehicle-id'));
+      });
     });
   }
 
-  // Populate featured listings (demo data)
-  populateFeaturedListings();
+  function handleInquire(vehicleId) {
+    trackEvent('inquire_click', { vehicleId: vehicleId });
+    // Prefer detail page with inquiry section
+    window.location.href = 'vehicle.html?id=' + encodeURIComponent(vehicleId);
+  }
 
-  // Performance: Log when page is loaded
-  console.log('✅ Pasalo Cars PH loaded successfully');
-});
+  // ---------- search (optional live log) ----------
+  function initializeSearch() {
+    var searchInput =
+      document.querySelector('.search-box input[type="search"]') ||
+      document.querySelector('.search-box input[name="q"]');
+    if (!searchInput) return;
 
-/**
- * Populate Featured Listings Section
- * Replace with actual API call in production
- */
-function populateFeaturedListings() {
-  const featuredList = document.querySelector('#featured-list');
-  if (!featuredList) return;
-
-  // Sample vehicle data (replace with actual API data)
-  const vehicles = [
-    {
-      id: 1,
-      title: 'Toyota Zenix Q Hybrid 2026',
-      image: 'https://via.placeholder.com/400x225?text=Toyota+Zenix',
-      cashOut: '₱350,000',
-      monthly: '₱42,338 / month',
-      location: 'Toyota Abad Santos',
-      financing: 'Toyota Financial Services (TFS)',
-      postedDaysAgo: 2,
-      status: 'To confirm'
-    },
-    {
-      id: 2,
-      title: 'Nissan Terra VE 4x2 Automatic 2026',
-      image: 'https://via.placeholder.com/400x225?text=Nissan+Terra',
-      cashOut: '₱300,000',
-      monthly: '₱40,700 / month',
-      location: 'Nissan Dealer',
-      financing: 'To confirm',
-      postedDaysAgo: 2,
-      status: 'Mandainyong'
-    },
-    {
-      id: 3,
-      title: 'Toyota Corolla Cross HEV CVT 2026',
-      image: 'https://via.placeholder.com/400x225?text=Toyota+Corolla',
-      cashOut: '₱245,000',
-      monthly: '₱36,000 / month',
-      location: 'Toyota Financial Services (TFS)',
-      financing: 'Toyota Financial Services (TFS)',
-      postedDaysAgo: 5,
-      status: 'Listed 5 days ago'
-    }
-  ];
-
-  // Render vehicles
-  featuredList.innerHTML = vehicles.map(vehicle => `
-    <article class="vehicle-card">
-      <img src="${vehicle.image}" alt="${vehicle.title}" class="vehicle-image">
-      <div class="vehicle-info">
-        <h3 class="vehicle-title">${vehicle.title}</h3>
-        
-        <div>
-          <div class="vehicle-price-label">CASH-OUT</div>
-          <div class="vehicle-price">${vehicle.cashOut}</div>
-          <div class="vehicle-monthly">${vehicle.monthly}</div>
-        </div>
-
-        <div class="vehicle-details">
-          <div class="vehicle-detail-item">
-            <span>📍 ${vehicle.location}</span>
-          </div>
-          <div class="vehicle-detail-item">
-            <span>🏦 ${vehicle.financing}</span>
-          </div>
-          <div class="vehicle-detail-item">
-            <span>⏱️ ${vehicle.status}</span>
-          </div>
-        </div>
-
-        <div class="vehicle-actions">
-          <a href="listing-details.html?id=${vehicle.id}" class="btn btn-secondary">View Details</a>
-          <button type="button" class="btn btn-primary" data-vehicle-id="${vehicle.id}">Inquire</button>
-        </div>
-      </div>
-    </article>
-  `).join('');
-
-  // Add event listeners to inquire buttons
-  document.querySelectorAll('[data-vehicle-id]').forEach(button => {
-    button.addEventListener('click', function() {
-      const vehicleId = this.getAttribute('data-vehicle-id');
-      handleInquire(vehicleId);
-    });
-  });
-}
-
-/**
- * Handle Vehicle Inquiry
- * @param {number} vehicleId - The vehicle ID
- */
-function handleInquire(vehicleId) {
-  console.log(`Inquiry for vehicle ${vehicleId}`);
-  // Redirect to inquiry form or open modal
-  window.location.href = `inquire.html?vehicle=${vehicleId}`;
-}
-
-/**
- * Debounce function for search input
- * @param {function} func - Function to debounce
- * @param {number} wait - Wait time in ms
- */
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
-
-/**
- * Handle real-time search (optional enhancement)
- */
-function initializeSearch() {
-  const searchInput = document.querySelector('.search-box input[type="search"]');
-  if (!searchInput) return;
-
-  const handleSearch = debounce(function(e) {
-    const query = e.target.value.trim();
-    if (query.length >= 2) {
-      // Perform search - can be replaced with API call
-      console.log('Searching for:', query);
-    }
-  }, 300);
-
-  searchInput.addEventListener('input', handleSearch);
-}
-
-/**
- * Intersection Observer for lazy loading and animations
- */
-function initializeObserver() {
-  if (!('IntersectionObserver' in window)) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.animation = 'slideUp 0.6s ease forwards';
-        observer.unobserve(entry.target);
+    var handleSearch = debounce(function (e) {
+      var query = e.target.value.trim();
+      if (query.length >= 2) {
+        trackEvent('search_type', { query: query });
       }
+    }, 300);
+
+    searchInput.addEventListener('input', handleSearch);
+  }
+
+  // ---------- intersection observer ----------
+  function initializeObserver() {
+    if (!('IntersectionObserver' in window)) return;
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = 'slideUp 0.6s ease forwards';
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    document.querySelectorAll('.vehicle-card, .category-card').forEach(function (card) {
+      observer.observe(card);
     });
-  }, { threshold: 0.1 });
+  }
 
-  document.querySelectorAll('.vehicle-card, .category-card').forEach(card => {
-    observer.observe(card);
+  // ---------- load vehicles.json ----------
+  function loadVehicles() {
+    var featuredList = document.querySelector('#featured-list');
+    if (featuredList) {
+      featuredList.innerHTML = '<div class="empty">Loading marketplace...</div>';
+    }
+
+    return fetch('data/vehicles.json?v=' + Date.now(), {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        vehicles = Array.isArray(data.vehicles) ? data.vehicles : Array.isArray(data) ? data : [];
+        window.vehicles = vehicles;
+        populateFeaturedListings();
+        // re-run observer after cards exist
+        initializeObserver();
+        console.log('✅ Pasalo Cars PH loaded', vehicles.length, 'vehicles');
+      })
+      .catch(function (err) {
+        console.warn('Failed to load vehicles.json', err);
+        if (featuredList) {
+          featuredList.innerHTML =
+            '<div class="empty">Could not load vehicle data. ' +
+            '<button type="button" class="btn btn-secondary" id="retry-vehicles">Retry</button></div>';
+          var retry = document.getElementById('retry-vehicles');
+          if (retry) retry.addEventListener('click', loadVehicles);
+        }
+      });
+  }
+
+  // ---------- boot ----------
+  document.addEventListener('DOMContentLoaded', function () {
+    setupMobileMenu();
+    setupSmoothScroll();
+    initializeSearch();
+    loadVehicles();
   });
-}
 
-// Initialize additional features
-document.addEventListener('DOMContentLoaded', function() {
-  initializeSearch();
-  initializeObserver();
-});
-
-/**
- * Utility: Get URL parameter
- * @param {string} param - Parameter name
- */
-function getUrlParameter(param) {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  return urlParams.get(param);
-}
-
-/**
- * Utility: Track user actions (analytics)
- * @param {string} action - Action name
- * @param {object} data - Additional data
- */
-function trackEvent(action, data = {}) {
-  console.log(`📊 Event: ${action}`, data);
-  // Replace with actual analytics tracking (GA, Mixpanel, etc.)
-}
+  // expose helpers for other scripts (data-recovery, listings, etc.)
+  window.getUrlParameter = getUrlParameter;
+  window.trackEvent = trackEvent;
+  window.populateFeaturedListings = populateFeaturedListings;
+  window.handleInquire = handleInquire;
+})();
