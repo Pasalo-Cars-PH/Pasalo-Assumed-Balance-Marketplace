@@ -6,11 +6,17 @@
   var DATA_RE = /(?:^|\/)data\/vehicles\.json(?:\?|$)/i;
 
   function repair(text) {
-    return String(text)
-      // Remove accidental quote after numeric JSON values: 41200" , 10" }
+    return String(text || '')
+      .replace(/^\uFEFF/, '')
+      /* Current catalog has one legacy entry with: "cash_out": 760000" followed immediately by the next key. */
+      .replace(/("cash_out"\s*:\s*-?\d+(?:\.\d+)?)"\s*(?=")/g, '$1,\n')
+      /* Normalize numeric values that were accidentally stored as quoted strings. */
+      .replace(/("(?:cash_out|monthly_payment|remaining_months|year|odometer|unitPrice|monthly|monthsPaid|monthsRemaining)"\s*:\s*)"(-?\d+(?:\.\d+)?)"/g, '$1$2')
+      .replace(/("(?:cash_out|monthly_payment|remaining_months|year|odometer|unitPrice|monthly|monthsPaid|monthsRemaining)"\s*:\s*)""(-?\d+(?:\.\d+)?)"/g, '$1$2')
+      /* Remove accidental quote after numeric JSON values. */
       .replace(/("(?:cash_out|monthly_payment|remaining_months|year|odometer)"\s*:\s*-?\d+(?:\.\d+)?)"(?=\s*[,}\n])/g, '$1')
-      // Remove accidental quote after boolean values.
-      .replace(/(\"(?:verified|featured)\"\s*:\s*(?:true|false))"(?=\s*[,}\n])/g, '$1');
+      /* Remove accidental quote after boolean values. */
+      .replace(/("(?:verified|featured)"\s*:\s*(?:true|false))"(?=\s*[,}\n])/g, '$1');
   }
 
   window.fetch = function (input, init) {
@@ -22,20 +28,12 @@
       return response.text().then(function (text) {
         try {
           JSON.parse(text);
-          return new Response(text, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: response.headers
-          });
+          return new Response(text, { status: response.status, statusText: response.statusText, headers: response.headers });
         } catch (firstError) {
           var fixed = repair(text);
-          JSON.parse(fixed); // fail here if the source is genuinely unrecoverable
+          JSON.parse(fixed);
           console.info('Pasalo Cars PH: repaired vehicle JSON before app load.');
-          return new Response(fixed, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: response.headers
-          });
+          return new Response(fixed, { status: response.status, statusText: response.statusText, headers: response.headers });
         }
       });
     });
