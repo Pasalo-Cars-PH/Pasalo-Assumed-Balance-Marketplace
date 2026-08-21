@@ -842,6 +842,30 @@
       "color": "Pearl White",
       "notes": "Assume balance / pasalo; super low MA",
       "image": "images/PCPH-000029.webp"
+    }, 
+    {
+      "id": "PCPH-000030",
+      "status": "active",
+      "verified": false,
+      "featured": true,
+      "make": "Ford",
+      "model": "Raptor",
+      "year": 2020,
+      "variant": "4x4 AT",
+      "transmission": "Automatic",
+      "odometer": 80000,
+      "odometer_unit": "kms",
+      "financing": "BDO",
+      "remaining_months": 10,
+      "monthly_payment": 41200,
+      "due_date": "September 10",
+      "cash_out": 760000"
+      "listedAt": "2026-08-21T12:30:00+08:00",
+      "updatedAt": "2026-08-21T12:30:00+08:00",
+      "emoji": "🛻",
+      "color": "White",
+      "notes": "Assume balance / pasalo",
+      "image": "images/PCPH-000030.webp"
     }
   ]
 }
