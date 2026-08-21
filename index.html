@@ -2,35 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#071a33">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1929">
   <meta name="google-site-verification" content="_09k9LnEj4-B4XxmjjgJxhEgByfThKt6ET8rHQNzTc0">
-  <title>Pasalo Cars PH | Pasalo & Assumed-Balance Vehicle Marketplace</title>
-  <meta name="description" content="Find Pasalo and Assumed-Balance vehicles by monthly payment, cash-out, location and brand across the Philippines.">
+  
+  <title>Pasalo Cars PH | Find Your Next Car Without Scratch</title>
+  <meta name="description" content="Browse pasalo and assumed-balance vehicles by monthly payment, cash-out, location and brand. Premium marketplace for smart car shoppers.">
+  
   <meta property="og:title" content="Pasalo Cars PH | Assumed Balance Marketplace">
-  <meta property="og:description" content="Find Pasalo and Assumed-Balance vehicles by monthly payment, cash-out, location and brand across the Philippines.">
+  <meta property="og:description" content="Find the perfect pasalo or assumed-balance vehicle that fits your budget.">
   <meta property="og:image" content="assets/pasalo-cars-ph-logo.png">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://pasalo-cars-ph.github.io/Pasalo-Assumed-Balance-Marketplace/">
-  <link rel="canonical" href="https://pasalo-cars-ph.github.io/Pasalo-Assumed-Balance-Marketplace/">
+  <meta property="og:url" content="https://pasalo-cars-ph.github.io/">
+  
+  <link rel="canonical" href="https://pasalo-cars-ph.github.io/">
   <link rel="icon" type="image/png" href="assets/pasalo-cars-ph-logo.png">
   <link rel="apple-touch-icon" href="assets/pasalo-cars-ph-logo.png">
-  <link rel="stylesheet" href="css/style.css?v=20260821-1">
+  <link rel="stylesheet" href="css/style-premium.css?v=1.0">
 </head>
 <body>
-  <!-- HEADER / NAVIGATION -->
+  <!-- HEADER -->
   <header class="site-header" role="banner">
     <div class="header-container">
-      <a class="brand" href="index.html" aria-label="Pasalo Cars PH home">
-        <img src="assets/pasalo-cars-ph-logo.png" alt="Pasalo Cars PH Logo" style="height:56px;width:auto;object-fit:contain">
-        <span class="brand-text">PASALO CARS PH</span>
+      <a class="brand" href="/" aria-label="Pasalo Cars PH Home">
+        <img src="assets/pasalo-cars-ph-logo.png" alt="Pasalo Cars PH Logo">
+        <span class="brand-text">PASALO CARS</span>
       </a>
       
-      <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="main-nav">
-        <span class="hamburger"></span>
+      <button class="menu-toggle" aria-label="Toggle Navigation" aria-expanded="false" aria-controls="mobile-nav">
+        ☰
       </button>
       
-      <nav id="main-nav" class="nav-desktop">
+      <nav class="nav-desktop" id="main-nav">
         <ul>
           <li><a href="listings.html">Buy a Car</a></li>
           <li><a href="list-your-car.html">Sell / Pasalo</a></li>
@@ -39,11 +42,11 @@
         </ul>
       </nav>
       
-      <a class="btn btn-primary header-cta" href="list-your-car.html">List Your Car</a>
+      <a href="list-your-car.html" class="btn btn-primary">List Your Car</a>
     </div>
   </header>
 
-  <!-- MOBILE NAVIGATION -->
+  <!-- MOBILE NAV -->
   <nav class="nav-mobile" id="mobile-nav" aria-hidden="true">
     <ul>
       <li><a href="listings.html">Buy a Car</a></li>
@@ -53,33 +56,23 @@
     </ul>
   </nav>
 
-  <!-- MAIN CONTENT -->
   <main role="main">
-    <!-- HERO SECTION -->
-    <section class="hero" aria-labelledby="hero-heading">
+    <!-- HERO -->
+    <section class="hero">
       <div class="hero-container">
         <div class="hero-copy">
           <span class="eyebrow">Pasalo & Assumed-Balance Marketplace</span>
-          <h1 id="hero-heading">Find Your Next Car <span>Without Starting From Scratch.</span></h1>
-          <p class="hero-subtitle">Browse available vehicles by monthly payment, cash-out, location and brand.</p>
+          <h1>Find Your Next Car <span>Without Starting From Scratch</span></h1>
+          <p class="hero-subtitle">Browse available vehicles by monthly payment, cash-out, location and brand. Everything you need to find the perfect deal.</p>
           
-          <!-- SEARCH FORM -->
-          <form class="search-box" action="listings.html" method="GET" aria-label="Search vehicles">
+          <form class="search-box" action="listings.html" method="GET">
             <fieldset>
-              <legend class="sr-only">Search filters</legend>
-              
               <div class="form-group">
-                <input 
-                  type="search" 
-                  name="q" 
-                  placeholder="Search make, model or keyword"
-                  aria-label="Search by make, model or keyword"
-                  class="form-input"
-                >
+                <input type="search" name="q" class="form-input" placeholder="Search make, model or keyword" aria-label="Search vehicles">
               </div>
               
               <div class="form-group">
-                <select name="location" aria-label="Filter by location" class="form-select">
+                <select name="location" class="form-select" aria-label="Select location">
                   <option value="">Any location</option>
                   <option>Cavite</option>
                   <option>Laguna</option>
@@ -90,7 +83,7 @@
               </div>
               
               <div class="form-group">
-                <select name="monthly" aria-label="Filter by monthly budget" class="form-select">
+                <select name="monthly" class="form-select" aria-label="Select monthly budget">
                   <option value="">Monthly budget</option>
                   <option value="15000">Up to ₱15K</option>
                   <option value="20000">Up to ₱20K</option>
@@ -103,17 +96,16 @@
             </fieldset>
           </form>
           
-          <!-- HERO ACTIONS -->
           <div class="hero-actions">
-            <a class="btn btn-secondary" href="find-my-car.html">🎯 Find My Car</a>
-            <p class="hero-tagline">Fresh listings • Mobile-first • Built for Pasalo buyers</p>
+            <a href="find-my-car.html" class="btn btn-secondary">🎯 Find My Car</a>
+            <p class="hero-tagline">Fresh listings • Mobile-first • Built for smart buyers</p>
           </div>
         </div>
         
-        <aside class="hero-panel" aria-label="Search criteria highlights">
+        <aside class="hero-panel">
           <div class="hero-stat">
             <strong>Fresh Deals</strong>
-            <span>Discover newly listed vehicles</span>
+            <span>New listings every week</span>
           </div>
           <div class="mini-search">
             <span>Monthly</span>
@@ -121,22 +113,22 @@
           </div>
           <div class="mini-search">
             <span>Cash-out</span>
-            <b>Choose your budget</b>
+            <b>Flexible amounts</b>
           </div>
           <div class="mini-search">
-            <span>Location</span>
+            <span>Coverage</span>
             <b>Philippines</b>
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- BROWSE BY TYPE -->
-    <section class="section" aria-labelledby="browse-heading">
+    <!-- CATEGORIES -->
+    <section class="section">
       <div class="section-head">
         <div>
           <span class="eyebrow">Browse</span>
-          <h2 id="browse-heading">Shop by vehicle type</h2>
+          <h2>Shop by vehicle type</h2>
         </div>
         <a href="listings.html" class="view-all">View all →</a>
       </div>
@@ -144,117 +136,116 @@
         <a href="listings.html?body=SUV" class="category-card">
           <span class="emoji">🚙</span>
           <b>SUV</b>
-          <span>Family & adventure</span>
+          <span>Family & Adventure</span>
         </a>
         <a href="listings.html?body=Sedan" class="category-card">
           <span class="emoji">🚗</span>
           <b>Sedan</b>
-          <span>Smart daily drives</span>
+          <span>Smooth & Efficient</span>
         </a>
         <a href="listings.html?body=MPV" class="category-card">
           <span class="emoji">🚐</span>
           <b>MPV</b>
-          <span>More room for less</span>
+          <span>Space & Comfort</span>
         </a>
         <a href="listings.html?body=Pickup" class="category-card">
           <span class="emoji">🛻</span>
           <b>Pickup</b>
-          <span>Work & lifestyle</span>
+          <span>Work Ready</span>
         </a>
         <a href="listings.html?q=hybrid" class="category-card">
           <span class="emoji">⚡</span>
           <b>Hybrid / EV</b>
-          <span>Efficient mobility</span>
+          <span>Eco-Friendly</span>
         </a>
       </div>
     </section>
 
     <!-- FEATURED LISTINGS -->
-    <section class="section section-tinted" aria-labelledby="featured-heading">
+    <section class="section section-tinted">
       <div class="section-head">
         <div>
-          <span class="eyebrow">Fresh Deals</span>
-          <h2 id="featured-heading">Just listed on Pasalo Cars PH</h2>
+          <span class="eyebrow">Featured</span>
+          <h2>Just listed on Pasalo Cars PH</h2>
         </div>
-        <a href="listings.html" class="view-all">Browse marketplace →</a>
+        <a href="listings.html" class="view-all">Browse all →</a>
       </div>
-      <div id="featured-list" class="vehicle-grid" role="region" aria-live="polite" aria-label="Featured vehicle listings">
+      <div class="vehicle-grid" id="featured-list" role="region" aria-label="Featured vehicles">
         <!-- Populated by JS -->
       </div>
     </section>
 
-    <!-- SMART SEARCH CTA -->
-    <section class="section section-banner" aria-labelledby="match-heading">
+    <!-- CTA - SMART MATCHING -->
+    <section class="section section-banner">
       <div class="banner-content">
-        <span class="eyebrow">Smarter Search</span>
-        <h2 id="match-heading">Not sure which deal fits your budget?</h2>
-        <p>Tell us your monthly budget, cash-out and preferred location. Get your best vehicle matches in minutes.</p>
-        <a class="btn btn-primary btn-large" href="find-my-car.html">Find My Car →</a>
+        <span class="eyebrow">Smart Matching</span>
+        <h2>Not sure which car fits your budget?</h2>
+        <p>Tell us your monthly payment, cash-out amount, and preferred location. We'll find your best matches in minutes.</p>
+        <a href="find-my-car.html" class="btn btn-secondary">Find My Car →</a>
       </div>
     </section>
 
     <!-- HOW IT WORKS -->
-    <section class="section" aria-labelledby="how-it-works-heading">
+    <section class="section">
       <div class="section-head">
         <div>
-          <span class="eyebrow">How It Works</span>
-          <h2 id="how-it-works-heading">From search to inquiry</h2>
+          <span class="eyebrow">Process</span>
+          <h2>How it works</h2>
         </div>
       </div>
       <ol class="steps">
         <li>
-          <span class="step-number" aria-hidden="true">01</span>
-          <h3>Find a vehicle</h3>
-          <p>Search by budget, location, brand and vehicle type.</p>
+          <span class="step-number">01</span>
+          <h3>Search & Filter</h3>
+          <p>Browse by budget, location, brand and vehicle type with precision filters.</p>
         </li>
         <li>
-          <span class="step-number" aria-hidden="true">02</span>
-          <h3>Check the details</h3>
-          <p>Review monthly payment, cash-out and listing information.</p>
+          <span class="step-number">02</span>
+          <h3>Review Details</h3>
+          <p>Check monthly payments, cash-out amounts and complete listing information.</p>
         </li>
         <li>
-          <span class="step-number" aria-hidden="true">03</span>
-          <h3>Send an inquiry</h3>
-          <p>Tell us your budget so we can qualify the opportunity.</p>
+          <span class="step-number">03</span>
+          <h3>Send Inquiry</h3>
+          <p>Connect with sellers and express your interest with just a few clicks.</p>
         </li>
         <li>
-          <span class="step-number" aria-hidden="true">04</span>
-          <h3>Connect</h3>
-          <p>Proceed to seller discussion and transaction due diligence.</p>
+          <span class="step-number">04</span>
+          <h3>Complete Deal</h3>
+          <p>Finalize transaction details and complete due diligence with confidence.</p>
         </li>
       </ol>
     </section>
 
-    <!-- SELLER CTA -->
-    <section class="section section-seller-cta" aria-labelledby="sell-heading">
+    <!-- CTA - SELLER -->
+    <section class="section section-seller-cta">
       <div class="seller-content">
-        <span class="eyebrow">Sell / Pasalo</span>
-        <h2 id="sell-heading">Ready to Pasalo Your Car?</h2>
-        <p>Submit your vehicle details for review and let qualified buyers discover your listing.</p>
-        <a class="btn btn-dark btn-large" href="list-your-car.html">List Your Car →</a>
+        <span class="eyebrow">Sell or Pasalo</span>
+        <h2>Ready to Pasalo Your Car?</h2>
+        <p>Submit your vehicle details and get in front of qualified buyers looking for exactly what you're offering.</p>
+        <a href="list-your-car.html" class="btn btn-dark">Start Listing →</a>
       </div>
     </section>
   </main>
 
   <!-- FOOTER -->
-  <footer role="contentinfo" class="site-footer">
+  <footer class="site-footer" role="contentinfo">
     <div class="footer-container">
       <div class="footer-brand">
         <b>PASALO CARS PH</b>
         <p>Pasalo & Assumed-Balance Vehicle Marketplace</p>
       </div>
-      <nav class="footer-nav" aria-label="Footer navigation">
+      <nav class="footer-nav" aria-label="Footer">
         <ul>
-          <li><a href="listings.html">Buy a Car</a></li>
-          <li><a href="list-your-car.html">Sell / Pasalo</a></li>
-          <li><a href="find-my-car.html">Find My Car</a></li>
+          <li><a href="listings.html">Browse Cars</a></li>
+          <li><a href="list-your-car.html">List Your Car</a></li>
+          <li><a href="how-it-works.html">How It Works</a></li>
         </ul>
       </nav>
     </div>
-    <small class="footer-copyright">© 2026 Pasalo Cars PH. Listing information should be independently verified before any transaction.</small>
+    <p class="footer-copyright">© 2026 Pasalo Cars PH. All rights reserved. Information should be verified independently before any transaction.</p>
   </footer>
 
-  <!-- SCRIPTS -->
-  <script src="js/app.js?v=20260821-1"></script>
+  <script src="js/app.js?v=1.0"></script>
 </body>
 </html>
