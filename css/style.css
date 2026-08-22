@@ -1,6 +1,6 @@
 /* =====================================================
    PASALO CARS PH — Updated Stylesheet
-   Fixes: overlapping text, badges, cards, header
+   Fixes: overlapping text, badges, cards, header + brand
    ===================================================== */
 
 :root {
@@ -107,18 +107,16 @@ ul {
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
-}
-
-.header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 5%;
-  height: 72px;
   display: flex;
   align-items: center;
   gap: 18px;
+  padding: 0 5%;
+  height: 72px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
+/* Brand – fixed structure */
 .brand {
   display: flex;
   align-items: center;
@@ -126,6 +124,8 @@ ul {
   font-weight: 900;
   letter-spacing: -0.03em;
   flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .brand img {
@@ -136,36 +136,65 @@ ul {
 }
 
 .brand-mark {
-  display: none;
   width: 36px;
   height: 36px;
   border-radius: 10px;
   background: var(--dark);
   color: #fff;
+  display: grid;
   place-items: center;
   font-weight: 900;
+  font-size: 16px;
+  flex-shrink: 0;
 }
 
-.brand-mark.show-mark {
-  display: grid;
-}
-
-/* Fixed brand text (prevents "PHASSUMED") */
+/* New brand text structure (prevents PHASSUMED) */
 .brand-text {
   display: flex;
   flex-direction: column;
   line-height: 1.15;
 }
 
-.brand-text b {
+.brand-main {
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: -0.03em;
+}
+
+.brand-main b {
   color: var(--brand);
 }
 
 .brand-sub {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--muted);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* Fallback for old structure */
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.brand-copy strong {
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.brand-copy b {
+  color: var(--brand);
+}
+
+.brand-copy small {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   margin-top: 1px;
 }
@@ -179,14 +208,20 @@ ul {
   gap: 22px;
 }
 
-.nav-desktop a {
+.site-header nav {
+  margin-left: auto;
+  display: flex;
+  gap: 22px;
+}
+
+.site-header nav a {
   font-size: 14px;
   font-weight: 700;
   color: var(--muted);
 }
 
-.nav-desktop a:hover,
-.nav-desktop a.active {
+.site-header nav a:hover,
+.site-header nav a.active {
   color: var(--brand);
 }
 
@@ -492,7 +527,7 @@ ul {
   transition: 0.2s;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* important para hindi mag-overflow */
+  min-width: 0;
 }
 
 .vehicle-card:hover {
@@ -708,7 +743,8 @@ ul {
 }
 
 /* ---------- Footer ---------- */
-.site-footer {
+.site-footer,
+footer {
   background: var(--dark);
   color: #fff;
   padding: 48px 5% 28px;
@@ -723,11 +759,14 @@ ul {
 }
 
 .footer-brand p,
-.footer-copyright {
+.footer-copyright,
+footer p,
+footer small {
   color: #9aa7ba;
 }
 
-.footer-nav a {
+.footer-nav a,
+footer a {
   display: block;
   padding: 6px 0;
   font-size: 14px;
@@ -735,7 +774,8 @@ ul {
   color: #d7dee8;
 }
 
-.footer-nav a:hover {
+.footer-nav a:hover,
+footer a:hover {
   color: #fff;
 }
 
@@ -755,6 +795,8 @@ ul {
 
 .page-hero h1 {
   font-size: 48px;
+  margin: 12px 0 14px;
+  letter-spacing: -0.03em;
 }
 
 .marketplace {
@@ -810,7 +852,7 @@ ul {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 960px) {
-  .nav-desktop,
+  .site-header nav,
   .header-cta {
     display: none;
   }
@@ -870,12 +912,13 @@ ul {
     padding: 10px 16px;
   }
 
-  .header-container,
+  .site-header,
   .hero,
   .section,
   .match-banner,
   .seller-cta,
   .site-footer,
+  footer,
   .marketplace,
   .page-hero {
     padding-left: 16px;
@@ -897,11 +940,11 @@ ul {
     height: 210px;
   }
 
-  .brand-text {
+  .brand-main {
     font-size: 14px;
   }
 
   .brand-sub {
-    font-size: 10px;
+    font-size: 9px;
   }
 }
